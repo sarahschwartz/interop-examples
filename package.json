@@ -1,0 +1,36 @@
+{
+  "name": "interop-examples",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "examples/*"
+  ],
+  "scripts": {
+    "prepare": "husky",
+    "fmt": "prettier --write .",
+    "lint": "bun lint:eslint && bun lint:markdown && bun lint:spelling && bun lint:prettier",
+    "lint:fix": "bun eslint --fix . && bun prettier --write . | grep -v 'unchanged' | xargs",
+    "lint:eslint": "eslint .",
+    "lint:markdown": "markdownlint-cli2 '**/*.md'",
+    "lint:spelling": "cspell .",
+    "lint:prettier": "prettier --check ."
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@stylistic/eslint-plugin": "^5.7.0",
+    "@types/bun": "latest",
+    "cspell": "^9.6.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "markdownlint-cli2": "^0.20.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-solidity": "^2.2.1",
+    "typescript-eslint": "^8.53.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

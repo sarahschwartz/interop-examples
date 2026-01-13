@@ -9,11 +9,11 @@ Further documentation is available in the official ZKsync docs.
 
 Each new example should:
 
-- either provide a unique use case for interop or duplicate an existing use
-  case but using a different tool or framework with significant differences.
-- contain a `README.md` file with instructions for running the example
-  locally, an overview of what the code does, and instructions for how to use the
-  app if applicable
+- either provide a unique use case for interop or duplicate an existing use case
+  but using a different tool or framework with significant differences.
+- contain a `README.md` file with instructions for running the example locally,
+  an overview of what the code does, and instructions for how to use the app if
+  applicable
 - pass the linting rules configured in root of this repo. To check this, you can
   run `bun lint`.
 - use the [`zksync-js`](https://matter-labs.github.io/zksync-js/latest/) and

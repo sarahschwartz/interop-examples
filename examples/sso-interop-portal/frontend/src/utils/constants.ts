@@ -19,7 +19,7 @@ export const L1_EXPLORER_BASE = "https://sepolia.etherscan.io/tx/";
 
 export const DEFAULT_ZKSYNC_OS_RPC_URL = "https://zksync-os-testnet-alpha.zksync.dev/";
 
-export const SHOW_INTEROP = import.meta.env?.VITE_SHOW_INTEROP === true;
+export const SHOW_INTEROP = import.meta.env?.VITE_SHOW_INTEROP === 'true';
 
 // ZKsync OS configuration
 export const zksyncOsTestnet = defineChain({

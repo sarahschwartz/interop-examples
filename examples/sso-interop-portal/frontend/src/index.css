@@ -531,3 +531,9 @@ input::placeholder {
   background: #ecfdf5;
   color: #047857;
 }
+
+.spinner {
+  display: flex;
+  justify-content: center;
+  padding: 6rem;
+}

@@ -30,8 +30,8 @@ More details can be found in the respective folder's `README.md` files.
 You must have [`bun`](https://bun.com/docs/installation) installed to run the
 basic app without L2 <-> L2 interop.
 
-To run the full app including L2 <-> L2 interop, you must also install [Rust](https://rust-lang.org/tools/install/)
-and version `1.3.4` of  `anvil` via
+To run the full app including L2 <-> L2 interop, you must also install
+[Rust](https://rust-lang.org/tools/install/) and version `1.3.4` of `anvil` via
 [`foundry`](https://getfoundry.sh/introduction/installation).
 
 ### Basic setup (without L2 <-> L2 interop)
@@ -156,7 +156,8 @@ In a fourth terminal window, clone the `cast-interop` repo:
 git clone https://github.com/mm-zk-codex/cast-interop
 ```
 
-Move into the cloned repo and run the command below to enable automatic execution of all the bundles on the chains above:
+Move into the cloned repo and run the command below to enable automatic
+execution of all the bundles on the chains above:
 
 ```bash
 cd cast-interop

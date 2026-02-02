@@ -1,0 +1,7 @@
+[submodule "examples/sso-interop-portal/interop-deps/zksync-os-server"]
+	path = examples/sso-interop-portal/interop-deps/zksync-os-server
+	url = https://github.com/matter-labs/zksync-os-server
+	branch = sb/interop-type-b-demo
+[submodule "examples/sso-interop-portal/interop-deps/cast-interop"]
+	path = examples/sso-interop-portal/interop-deps/cast-interop
+	url = https://github.com/mm-zk-codex/cast-interop

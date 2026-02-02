@@ -108,19 +108,13 @@ some testnet funds to try out the other tabs.
 
 #### Setup local chains for interop testing
 
-Clone the ZKsync OS server repository:
+Move into the ZKsync OS server folder:
 
 ```bash
-git clone https://github.com/matter-labs/zksync-os-server.git --branch sb/interop-type-b-demo
+cd examples/sso-interop-portal/interop-deps/zksync-os-server
 ```
 
-Move into the cloned repo:
-
-```bash
-cd zksync-os-server
-```
-
-Then in three terminal windows run:
+Then in three separate terminal windows run:
 
 (Runs the local L1)
 
@@ -150,17 +144,16 @@ You should now have three local chains running:
 > completely erased. These are in-memory nodes, so they do no persist any
 > storage of the chains.
 
-In a fourth terminal window, clone the `cast-interop` repo:
+In a fourth terminal window, move into the `cast-interop` folder:
 
 ```bash
-git clone https://github.com/mm-zk-codex/cast-interop
+cd examples/sso-interop-portal/interop-deps/cast-interop
 ```
 
-Move into the cloned repo and run the command below to enable automatic
+Then run the command below to enable automatic
 execution of all the bundles on the chains above:
 
 ```bash
-cd cast-interop
 cargo run --release -- auto-relay --rpc http://0.0.0.0:3050 http://0.0.0.0:3051 --private-key 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
 ```
 

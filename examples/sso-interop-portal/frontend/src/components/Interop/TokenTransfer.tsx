@@ -129,6 +129,7 @@ export function TokenTransfer({ networksDetected }: Props) {
       const result = await transferTokensInterop(token, inputAmount, isAToB, onProgress);
       setTxInfo(result);
       setIsSuccess(true);
+      handleRefresh();
     } catch (error) {
       console.log("Error sending tokens: ", error, typeof error);
       setError(typeof error === "string" ? error : "unknown error");

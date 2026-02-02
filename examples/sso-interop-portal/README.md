@@ -30,10 +30,9 @@ More details can be found in the respective folder's `README.md` files.
 You must have [`bun`](https://bun.com/docs/installation) installed to run the
 basic app without L2 <-> L2 interop.
 
-To run the full app including L2 <-> L2 interop, you must also install the
-latest versions of `anvil` via
-[`foundry`](https://getfoundry.sh/introduction/installation), and
-[Rust](https://rust-lang.org/tools/install/).
+To run the full app including L2 <-> L2 interop, you must also install [Rust](https://rust-lang.org/tools/install/)
+and version `1.3.4` of  `anvil` via
+[`foundry`](https://getfoundry.sh/introduction/installation).
 
 ### Basic setup (without L2 <-> L2 interop)
 
@@ -112,17 +111,34 @@ some testnet funds to try out the other tabs.
 Clone the ZKsync OS server repository:
 
 ```bash
-git clone https://github.com/matter-labs/zksync-os-server.git
+git clone https://github.com/matter-labs/zksync-os-server.git --branch sb/interop-type-b-demo
 ```
 
-Move into the cloned repo and start the local interop environment:
+Move into the cloned repo:
 
 ```bash
-./run_local.sh ./local-chains/v31.0/multi_chain
+cd zksync-os-server
 ```
 
-The first time running this will take a bit longer so dependencies can be
-compiled.
+Then in three terminal windows run:
+
+(Runs the local L1)
+
+```bash
+anvil --load-state ./local-chains/v31/zkos-l1-state.json --port 8545
+```
+
+(Runs the local L2: Chain A)
+
+```bash
+cargo run --release -- --config ./local-chains/v31/multiple-chains/chain1.json
+```
+
+(Runs the local L2: Chain B)
+
+```bash
+cargo run --release -- --config ./local-chains/v31/multiple-chains/chain2.json
+```
 
 You should now have three local chains running:
 
@@ -133,6 +149,19 @@ You should now have three local chains running:
 > Note that once you end this process, the history of each chain will be
 > completely erased. These are in-memory nodes, so they do no persist any
 > storage of the chains.
+
+In a fourth terminal window, clone the `cast-interop` repo:
+
+```bash
+git clone https://github.com/mm-zk-codex/cast-interop
+```
+
+Move into the cloned repo and run the command below to enable automatic execution of all the bundles on the chains above:
+
+```bash
+cd cast-interop
+cargo run --release -- auto-relay --rpc http://0.0.0.0:3050 http://0.0.0.0:3051 --private-key 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
+```
 
 #### Deploy a local test USD token
 

@@ -7,8 +7,7 @@ Further documentation is available in the official ZKsync docs.
 
 ## Cloning
 
-This repo contains submodules.
-To clone this repo, use:
+This repo contains submodules. To clone this repo, use:
 
 ```bash
 git clone https://github.com/matter-labs/interop-examples --recursive

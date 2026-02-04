@@ -5,6 +5,20 @@ interoperability between ZKsync chains.
 
 Further documentation is available in the official ZKsync docs.
 
+## Cloning
+
+This repo contains submodules. To clone this repo, use:
+
+```bash
+git clone https://github.com/matter-labs/interop-examples --recursive
+```
+
+Or if you already have it cloned without the submodules, run:
+
+```bash
+git submodule update --init --recursive
+```
+
 ## Contributing
 
 Each new example should:

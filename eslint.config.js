@@ -1,5 +1,4 @@
 import pluginJs from "@eslint/js";
-import stylistic from "@stylistic/eslint-plugin";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -14,20 +13,15 @@ export default [
       "**/.nuxt/",
       "**/.output/",
       "**/artifacts-zk/",
+      "**/artifacts/",
+      "**/abis/",
+      "**/ignition/deployments/",
+      "**/cache/",
       "**/deployments-zk/",
       "**/cache-zk/",
       "**/typechain-types/",
     ],
   },
-  { files: ["**/*.{js,mjs,cjs,ts}"] },
-  stylistic.configs.customize({
-    indent: 2,
-    quotes: "double",
-    semi: true,
-    arrowParens: "always",
-    quoteProps: "as-needed",
-    braceStyle: "1tbs",
-  }),
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,

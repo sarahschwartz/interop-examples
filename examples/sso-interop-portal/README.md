@@ -30,6 +30,10 @@ More details can be found in the respective folder's `README.md` files.
 You must have [`bun`](https://bun.com/docs/installation) installed to run the
 basic app without L2 <-> L2 interop.
 
+You must also be able to create a passkey on your device with user verification enabled.
+This means some sort of biometric verification or your system PIN or password.
+Make sure this is enabled on your device.
+
 To run the full app including L2 <-> L2 interop, you must also install **the
 latest stable versions** of [Rust](https://rust-lang.org/tools/install/) and
 `anvil` via [`foundry`](https://getfoundry.sh/introduction/installation).

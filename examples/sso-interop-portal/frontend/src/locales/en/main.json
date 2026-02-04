@@ -59,7 +59,7 @@
     },
     "earn": {
       "title": "Earn Interest with Aave",
-      "subtitle": "Deposit your ETH to earn interest through Aave lending protocol on Ethereum Layer 1.",
+      "subtitle": "Deposit your ETH to earn interest through Aave lending protocol on Ethereum Layer 1 (Sepolia).",
       "shadowAccount": "Shadow Account:",
       "deposits": "Aave Deposits",
       "refreshBtn": "Refresh",

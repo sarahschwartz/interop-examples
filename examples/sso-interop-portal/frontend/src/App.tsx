@@ -31,7 +31,7 @@ function App() {
 
   const balance = useBalance({
     address: accountAddress,
-    chainId: zksyncOsTestnet.id
+    chainId: zksyncOsTestnet.id,
   });
 
   useEffect(() => {

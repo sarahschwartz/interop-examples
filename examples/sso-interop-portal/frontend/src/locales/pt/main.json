@@ -59,7 +59,7 @@
     },
     "earn": {
       "title": "Ganhe juros com a Aave",
-      "subtitle": "Deposite seu ETH para gerar juros através do protocolo de empréstimos da Aave na Ethereum Layer 1.",
+      "subtitle": "Deposite seu ETH para gerar juros através do protocolo de empréstimos da Aave na Ethereum Layer 1 (Sepolia).",
       "shadowAccount": "Conta sombra:",
       "deposits": "Depósitos na Aave",
       "refreshBtn": "Atualizar",

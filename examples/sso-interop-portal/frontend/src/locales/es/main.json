@@ -59,7 +59,7 @@
     },
     "earn": {
       "title": "Genera intereses con Aave",
-      "subtitle": "Deposita tu ETH para generar intereses a través del protocolo de préstamos Aave en Ethereum Layer 1.",
+      "subtitle": "Deposita tu ETH para generar intereses a través del protocolo de préstamos Aave en Ethereum Layer 1 (Sepolia).",
       "shadowAccount": "Cuenta espejo:",
       "deposits": "Depósitos en Aave",
       "refreshBtn": "Actualizar",

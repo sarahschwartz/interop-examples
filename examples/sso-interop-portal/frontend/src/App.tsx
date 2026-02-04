@@ -8,7 +8,7 @@ import { HomeTab } from "./components/Home/HomeTab";
 import { InteropTab } from "./components/Interop/InteropTab";
 import { Navigation } from "./components/Navigation";
 import { SendTab } from "./components/SendTab";
-import { SHOW_INTEROP } from "./utils/constants";
+import { SHOW_INTEROP, zksyncOsTestnet } from "./utils/constants";
 import { getShadowAccount } from "./utils/l1-interop/aave-utils";
 import { getTabFromUrl, setTabInUrl, type Tab } from "./utils/tabs";
 import type { PasskeyCredential } from "./utils/types";
@@ -31,6 +31,7 @@ function App() {
 
   const balance = useBalance({
     address: accountAddress,
+    chainId: zksyncOsTestnet.id
   });
 
   useEffect(() => {

@@ -18,7 +18,7 @@ const envSchema = z.object({
 
   EXECUTOR_PRIVATE_KEY: z.string().length(66),
 
-  L1_RPC_URL: z.string().url().default("https://ethereum-sepolia-rpc.publicnode.com"),
+  L1_RPC_URL: z.string().url(),
 
   L2_RPC_URL: z.string().url().default("https://zksync-os-testnet-alpha.zksync.dev/"),
 

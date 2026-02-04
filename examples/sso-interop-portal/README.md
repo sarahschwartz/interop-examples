@@ -2,12 +2,12 @@
 
 This example shows how to implement:
 
-- L1 <-> L2 interop to deposit and withdraw ETH into Aave
+- L1 <-> L2 interop to deposit and withdraw ETH into Aave on Sepolia testnet
 - creating ZKsync SSO passkey-based accounts tied to a single domain
 - sending basic ETH transfers using a passkey for authentication
 - sending bundled transactions via the ZKsync SSO bundler
-- (Optional) L2 <-> L2 interop for sending ERC20 tokens and arbitrary messages
-  between chains
+- (Optional) local L2 <-> L2 interop for sending ERC20 tokens and arbitrary
+  messages between chains
 
 ## How it works
 
@@ -25,18 +25,33 @@ More details can be found in the respective folder's `README.md` files.
 
 ## Running locally
 
-## Prerequisites
+### Prerequisites
 
 You must have [`bun`](https://bun.com/docs/installation) installed to run the
 basic app without L2 <-> L2 interop.
 
-You must also be able to create a passkey on your device with user verification enabled.
-This means some sort of biometric verification or your system PIN or password.
-Make sure this is enabled on your device.
+You must also be able to create a passkey on your device with user verification
+enabled. This means some sort of biometric verification or your system PIN or
+password. Make sure this is enabled on your device.
 
-To run the full app including L2 <-> L2 interop, you must also install **the
-latest stable versions** of [Rust](https://rust-lang.org/tools/install/) and
-`anvil` via [`foundry`](https://getfoundry.sh/introduction/installation).
+To run the full app including L2 <-> L2 interop, you must also install the
+latest stable versions of [Rust](https://rust-lang.org/tools/install/) and
+version `1.5.1` of `anvil` via
+[`foundry`](https://getfoundry.sh/introduction/installation).
+
+### Cloning the Repo
+
+This repo contains submodules. To clone this repo, use:
+
+```bash
+git clone https://github.com/matter-labs/interop-examples --recursive
+```
+
+Or if you already have it cloned without the submodules, run:
+
+```bash
+git submodule update --init --recursive
+```
 
 ### Basic setup (without L2 <-> L2 interop)
 
@@ -62,9 +77,15 @@ Make sure to leave some funds on sepolia as well.
 #### Setup the backend environment variables
 
 Inside the `backend` folder create a new `.env` file. Use the `.env.example`
-file as a guide for your `.env`. The only environment variable that MUST be set
-is the `EXECUTOR_PRIVATE_KEY`. This should be the private key of the wallet with
-testnet funds from the previous step.
+file as a guide for your `.env`.
+
+The only environment variables that MUST be set are:
+
+- `EXECUTOR_PRIVATE_KEY`: this should be the private key of the wallet with
+  testnet funds from the previous step.
+- `L1_RPC_URL`: This should be an RPC URL for Sepolia testnet. You can get one
+  for free from [Infura](https://www.infura.io/) or
+  [Alchemy](https://www.alchemy.com/).
 
 #### Run the backend
 
@@ -112,6 +133,10 @@ some testnet funds to try out the other tabs.
 
 #### Setup local chains for interop testing
 
+> Make sure you have [Rust](https://rust-lang.org/tools/install/) and version
+> `1.5.1` of `anvil` via
+> [`foundry`](https://getfoundry.sh/introduction/installation) installed.
+
 Move into the ZKsync OS server folder:
 
 ```bash
@@ -130,8 +155,8 @@ compile.
 You should now have three local chains running:
 
 - a local L1 chain running at port 8545
-- a local L2 chain running at port 6565
-- a second local L2 chain running at port 6566
+- a local L2 chain running at port 3050 (chain ID 6565)
+- a second local L2 chain running at port 3051 (chain ID 6566)
 
 > Note that once you end this process, the history of each chain will be
 > completely erased. These are in-memory nodes, so they do no persist any

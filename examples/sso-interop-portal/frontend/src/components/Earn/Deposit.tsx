@@ -92,6 +92,7 @@ export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredent
               id="aaveDepositAmount"
               step="0.001"
               placeholder="0.01"
+              min="0"
               value={depositAmount}
               disabled={btnsDisabled || isSending}
               onChange={handleDepositAmountChange}

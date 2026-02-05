@@ -117,6 +117,7 @@ export function SendTab({ accountAddress, balance, passkeyCredentials }: Props) 
                 type="number"
                 id="transferAmount"
                 step="0.001"
+                min="0"
                 placeholder="0.01"
                 value={amount}
                 onChange={handleAmountChange}

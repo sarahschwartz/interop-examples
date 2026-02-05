@@ -96,6 +96,7 @@ export function Withdraw({ aaveBalance, balance, shadowAccount, accountAddress, 
               type="number"
               id="aaveWithdrawAmount"
               step="0.001"
+              min="0"
               placeholder="0.01"
               value={withdrawAmount}
               onChange={handleWithdrawAmountChange}

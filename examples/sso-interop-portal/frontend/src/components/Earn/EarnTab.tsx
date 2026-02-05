@@ -21,6 +21,8 @@ interface Props {
 export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredentials }: Props) {
   const [pendingTxns, setPendingTxns] = useState<PendingTxnState[]>([]);
   const [finalizedTxns, setFinalizedTxns] = useState<FinalizedTxnState[]>([]);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const triggerRefresh = () => setRefreshTick((x) => x + 1);
 
   const aaveBalance = useReadContract({
     address: AAVE_CONTRACTS.aToken,
@@ -32,33 +34,39 @@ export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredent
 
   const { t } = useTranslation();
 
-  const getActivity = async () => {
-    try {
-      const response = await fetch(STATUS_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accountAddress }),
-      });
-
-      if (!response.ok) return;
-
-      const status = await response.json();
-      setPendingTxns(status.responseObject.pending);
-      setFinalizedTxns(status.responseObject.finalized);
-    } catch (err) {
-      console.error("Failed to fetch activity", err);
-    }
-  };
-
   useEffect(() => {
     if (!accountAddress) return;
+
+    const controller = new AbortController();
+
+    const getActivity = async () => {
+      try {
+        const response = await fetch(STATUS_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accountAddress }),
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const status = await response.json();
+        if (controller.signal.aborted) return;
+
+        setPendingTxns(status.responseObject.pending);
+        setFinalizedTxns(status.responseObject.finalized);
+      } catch (err: any) {
+        if (err?.name !== "AbortError") console.error("Error updating status:", err);
+      }
+    };
+
     getActivity();
     const intervalId = setInterval(getActivity, 60_000);
 
     return () => {
+      controller.abort();
       clearInterval(intervalId);
     };
-  }, [accountAddress]);
+  }, [accountAddress, refreshTick]);
 
   return (
     <div
@@ -128,7 +136,7 @@ export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredent
         balance={balance}
         passkeyCredentials={passkeyCredentials}
         accountAddress={accountAddress}
-        getActivity={getActivity}
+        triggerRefresh={triggerRefresh}
       />
 
       <Withdraw
@@ -137,7 +145,7 @@ export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredent
         balance={balance}
         passkeyCredentials={passkeyCredentials}
         accountAddress={accountAddress}
-        getActivity={getActivity}
+        triggerRefresh={triggerRefresh}
       />
 
       <ActivityTab

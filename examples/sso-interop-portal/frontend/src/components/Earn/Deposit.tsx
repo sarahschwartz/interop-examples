@@ -8,13 +8,13 @@ import type { PasskeyCredential } from "~/utils/types";
 
 interface Props {
   balance: UseBalanceReturnType;
-  getActivity: () => Promise<void>;
+  triggerRefresh: () => void;
   shadowAccount?: Address;
   accountAddress?: Address;
   passkeyCredentials?: PasskeyCredential;
 }
 
-export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredentials, getActivity }: Props) {
+export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredentials, triggerRefresh }: Props) {
   const [depositAmount, setDepositAmount] = useState<string>("0");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [depositSuccess, setDepositSuccess] = useState<boolean>(false);
@@ -59,7 +59,7 @@ export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredent
       setTxHash(hash);
       setDepositSuccess(true);
       balance.refetch();
-      getActivity();
+      triggerRefresh();
     } catch (error) {
       console.log("Error depositing ETH:", error);
       setDepositError(typeof error === "string" ? error : "unknown error");

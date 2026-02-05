@@ -17,6 +17,8 @@ interface Props {
 
 export function QuickActions({ setActiveTab, balance, accountAddress, shadowAccount }: Props) {
   const [isCallingFaucet, setIsCallingFaucet] = useState<boolean>(false);
+  const [isFaucetSuccess, setIsFaucetSuccess] = useState<boolean>(false);
+  const [isFaucetError, setIsFaucetError] = useState<string | undefined>();
   const { t } = useTranslation();
 
   const entryPointBalance = useReadContract({
@@ -43,6 +45,8 @@ export function QuickActions({ setActiveTab, balance, accountAddress, shadowAcco
   async function handleFaucet() {
     console.log("calling faucet");
     setIsCallingFaucet(true);
+    setIsFaucetSuccess(false);
+    setIsFaucetError(undefined);
     try {
       const response = await fetch(FAUCET_ENDPOINT, {
         method: "POST",
@@ -57,8 +61,10 @@ export function QuickActions({ setActiveTab, balance, accountAddress, shadowAcco
       entryPointBalance.refetch();
       shadowAccountBalance.refetch();
       balance.refetch();
+      setIsFaucetSuccess(true);
     } catch (error) {
-      console.log("error calling faucet", error);
+      console.log("error calling faucet: ", error);
+      setIsFaucetError(typeof error === 'string' ? error : 'unknown error');
     } finally {
       setIsCallingFaucet(false);
     }
@@ -94,6 +100,22 @@ export function QuickActions({ setActiveTab, balance, accountAddress, shadowAcco
         >
           {isCallingFaucet ? t("home.funding") : t("home.faucetBtn")}
         </button>
+      )}
+
+      {isFaucetSuccess && (
+         <div
+          className="alert alert-success"
+        >
+          {t("home.faucetSuccess")}
+        </div>
+      )}
+
+      {isFaucetError && (
+         <div
+          className="alert alert-error"
+        >
+          {t("home.faucetFailed")}{" "}{isFaucetError}
+        </div>
       )}
     </div>
   );

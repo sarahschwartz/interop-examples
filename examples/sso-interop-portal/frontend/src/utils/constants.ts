@@ -9,7 +9,7 @@ export const STORAGE_KEY_LANGUAGE = "zksync-interop-demo-language";
 
 export const BUNDLER_URL = "https://bundler-api.stage-sso.zksync.dev";
 
-export const BACKEND_URL = "http://localhost:4340";
+export const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL || "http://localhost:4340";
 export const STATUS_ENDPOINT = `${BACKEND_URL}/status`;
 export const DEPLOY_ACCOUNT_ENDPOINT = `${BACKEND_URL}/deploy-account`;
 export const FAUCET_ENDPOINT = `${BACKEND_URL}/faucet`;
@@ -71,7 +71,8 @@ export const ssoContracts = {
   entryPoint: "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108" as `0x${string}`,
 };
 
-export const RP_ID = "localhost";
+// TODO: use this once new SSO SDK is ready and add to .env.example
+// export const RP_ID = import.meta.env?.VITE_RP_ID || "localhost";
 
 /* *********** L1 <-> L2 INTEROP CONSTANTS *********** */
 

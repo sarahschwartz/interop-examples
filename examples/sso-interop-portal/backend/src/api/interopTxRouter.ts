@@ -33,6 +33,7 @@ interopTxRouter.post("/", async (req: Request, res: Response) => {
   } else {
     try {
       const receipt = await client.zks.getReceiptWithL2ToL1(args.txHash);
+      if(!receipt) throw new Error(`Missing receipt for ${args.txHash}`);
       const metadata = await extractTxMetadata(receipt);
       // check if tx has correct logs
       if (metadata.action !== "Deposit" && metadata.action !== "Withdrawal") {

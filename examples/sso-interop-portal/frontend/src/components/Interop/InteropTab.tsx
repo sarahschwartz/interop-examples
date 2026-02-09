@@ -3,11 +3,17 @@ import { useTranslation } from "react-i18next";
 import { erc20Abi } from "viem";
 
 import { CLIENT_CHAIN_A, CLIENT_CHAIN_B, TOKEN_ADDRESS } from "~/utils/constants";
+import type { Tab } from "~/utils/tabs";
 
+import { BackButton } from "../BackButton";
 import { InteropMessage } from "./InteropMessage";
 import { TokenTransfer } from "./TokenTransfer";
 
-export function InteropTab() {
+interface Props {
+  setActiveTab: (next: Tab) => void;
+}
+
+export function InteropTab({ setActiveTab }: Props) {
   const [networksDetected, setNetworksDetected] = useState<boolean>(false);
 
   useEffect(() => {
@@ -38,38 +44,47 @@ export function InteropTab() {
       className="tab-content"
       id="interop-tab"
     >
-      <div className="card">
+      <div className="tab-header">
+        <BackButton setActiveTab={setActiveTab} />
         <div
           id="interop-title"
-          className="card-title"
+          className="tab-title"
         >
           {t("interop.title")}
         </div>
-        <div className="card-subtitle">
-          <span id="interop-subtitle">{t("interop.subtitle")}</span>
-          <br />
-          <strong>
-            <span id="interop-note-label">{t("interop.noteLabel")}</span>
-          </strong>{" "}
-          <span id="interop-note">{t("interop.note")}</span>
-        </div>
-        {/* <!-- Connection Warning --> */}
-        {!networksDetected && (
-          <div className="alert alert-error">
-            <strong>
-              ⚠️ <span id="interop-connection-issue">{t("interop.connectionIssue")}</span>
-            </strong>
-            <div id="interop-warning-message"></div>
-            <div className="interop-connection-box">
-              <span id="interop-connection-msg">{t("interop.connectionMsg")}</span>
-              <ul className="connection-list">
-                <li id="interop-connection-check-1">{t("interop.connectionCheck1")}</li>
-                <li id="interop-connection-check-2">{t("interop.connectionCheck2")}</li>
-              </ul>
-            </div>
-          </div>
-        )}
       </div>
+      <p
+        id="interop-subtitle"
+        className="tab-description"
+      >
+        {t("interop.subtitle")}
+      </p>
+
+      <div
+        className="aave-info"
+        style={{ marginBottom: "16px", alignItems: "flex-start" }}
+      >
+        <span>
+          <strong id="interop-note-label">{t("interop.noteLabel")}</strong>{" "}
+          <span id="interop-note">{t("interop.note")}</span>
+        </span>
+      </div>
+      {/* <!-- Connection Warning --> */}
+      {!networksDetected && (
+        <div className="alert alert-error">
+          <strong>
+            ⚠️ <span id="interop-connection-issue">{t("interop.connectionIssue")}</span>
+          </strong>
+          <div id="interop-warning-message"></div>
+          <div className="interop-connection-box">
+            <span id="interop-connection-msg">{t("interop.connectionMsg")}</span>
+            <ul className="connection-list">
+              <li id="interop-connection-check-1">{t("interop.connectionCheck1")}</li>
+              <li id="interop-connection-check-2">{t("interop.connectionCheck2")}</li>
+            </ul>
+          </div>
+        </div>
+      )}
 
       <InteropMessage networksDetected={networksDetected} />
 

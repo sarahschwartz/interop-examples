@@ -1,20 +1,8 @@
 {
   "translation": {
-    "topbar": {
-      "network": "Red",
-      "balance": "Saldo"
-    },
-    "nav": {
-      "home": "Inicio",
-      "send": "Trasferencias",
-      "earn": "Inversión",
-      "interop": "Interop",
-      "activity": "Actividad"
-    },
     "home": {
       "getStarted": "Empezar",
       "setupWallet": "Configura tu billetera segura para empezar a enviar y recibir dinero",
-      "createKey": "Crear clave de seguridad",
       "userName": "El nombre de tu clave",
       "createPasskeyBtn": "Crear billetera segura",
       "keyCreated": "✓ Llave de acceso creada",
@@ -24,26 +12,34 @@
       "deployWallet": "Implementa tu monedero inteligente en la red para empezar a gestionar tus fondos.",
       "deployAccountBtn": "Activar billetera",
       "walletBalance": "Tu saldo",
-      "yourWallet": "Tu billetera",
       "resetPasskeyMainBtn": "Restablecer passkey",
-      "quickActions": "Acciones rápidas",
+      "resetPasskeyAlert": "¿Estás seguro de que deseas redefinir tu passkey? Deberás crear una nueva y desplegar una nueva cuenta.",
       "quickSendBtn": "Enviar dinero",
       "quickEarnBtn": "Genera intereses",
-      "faucetBtn": "Faucet para tu billetera",
+      "faucetBtn": "Llamar al faucet",
       "enterUserName": "Por favor, introduce el nombre de tu clave",
       "creating": "Creando...",
       "failedToCreateKey": "Error al crear la passkey.",
       "deploying": "Implementando...",
       "deployFailed": "Error en la implementación:",
       "deployAccount": "Implementar cuenta",
-      "refreshing": "Actualizando...",
-      "refreshBalance": "Actualizar saldo",
       "funding": "Fondeando...",
-      "faucetSuccess": "¡Éxito! Tu billetera ha sido fondeada con:\n• 0.01 ETH al EntryPoint\n• 0.01 ETH directamente a la billetera\n• 0.03 ETH a tu cuenta espejo en Sepolia",
-      "faucetFailed": "Error del faucet:",
       "faucet": "Faucet para tu billetera",
+      "faucetDesc": "Obtener más fondos de testnet.",
       "balanceError": "Error al cargar el saldo",
-      "balanceFailed": "No se pudo obtener el saldo"
+      "copied": "Copiado",
+      "deployStep1": "Implementando una nueva cuenta SSO",
+      "deployStep2": "Inicializando los módulos de la cuenta",
+      "deployStep3": "Financiando la cuenta con ETH de testnet",
+      "walletActivated": "¡Billetera activada!",
+      "quickInteropBtn": "Interop",
+      "sendTitle": "Enviar",
+      "sendDesc": "Transfiere ETH a cualquier dirección en la red ZKsync OS",
+      "earnTitle": "Generar",
+      "earnDesc": "Deposita ETH en Aave en L1 y genera intereses",
+      "interopTitle": "Interop",
+      "interopDesc": "Transfiere tokens entre cadenas ZKsync locales",
+      "aaveDeposits": "Depósitos en Aave"
     },
     "send": {
       "sendMoney": "Enviar dinero",
@@ -87,9 +83,11 @@
       "finalized": "Finalizado",
       "action": "Acción",
       "status": "Estado",
-      "finalizedAt": "Finalizado en"
+      "finalizedAt": "Finalizado en",
+      "transaction": "Transacción"
     },
     "interop": {
+      "networkHeader": "Redes Locales",
       "title": "Interop entre redes (Local)",
       "subtitle": "Envía mensajes entre dos redes locales de ZKsync usando mensajería interop L2-a-L2.",
       "noteLabel": "Nota:",
@@ -142,11 +140,6 @@
       "directionError": "Todavía no es posible transferir datos de la red B a la red A.",
       "invalidAmountA": "La cantidad es superior a su saldo en la red A.",
       "invalidAmountB": "La cantidad es superior a su saldo en la red B."
-    },
-    "footer": {
-      "network": "Red:",
-      "poweredByZk": "Impulsado por ZKsync",
-      "securedByPasskeys": "Protegido con autenticación por passkey"
     }
   }
 }

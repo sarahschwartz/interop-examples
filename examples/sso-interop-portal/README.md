@@ -181,10 +181,9 @@ You will see the deployed token contract address printed in the console. You can
 also find it in the
 `token-contract/ignition/deployments/chain-6565/deployed_addresses.json` file.
 
-> Note that you must redeploy the token each time you stop and start the local
-> chains in the previous step, as the history is erased each time the local
-> chains stop. Delete the `ignition/deployments` folder to erase the previous
-> deployment record before redeploying.
+> Note that you must redeploy the token contract each time you stop and start
+> the local chains in the previous step, as the history is erased each time the
+> local chains stop.
 
 #### Setup the frontend environment variables
 

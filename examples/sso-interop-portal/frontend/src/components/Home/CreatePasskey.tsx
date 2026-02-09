@@ -18,12 +18,12 @@ export function CreatePasskey({ setPasskeyCredentials, passkeyCredentials }: Pro
 
   async function handleCreatePasskey(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setCreationError(undefined);
-    if (!passkeyName) {
-      setCreationError("no-user-name");
-      return;
-    }
     try {
+      setCreationError(undefined);
+      if (!passkeyName) {
+        setCreationError("no-user-name");
+        return;
+      }
       setPasskeyBtnDisabled(true);
       const newCredentials = await createNewPasskey(passkeyName);
       setPasskeyCredentials(newCredentials);
@@ -40,37 +40,49 @@ export function CreatePasskey({ setPasskeyCredentials, passkeyCredentials }: Pro
       className={`setup-step ${passkeyCredentials?.credentialId ? "completed" : ""}`}
       id="passkey-step"
     >
-      <div className="step-header">
-        <div
-          className={`step-icon ${passkeyCredentials?.credentialId ? "completed" : ""}`}
-          id="passkey-icon"
-        >
-          {passkeyCredentials?.credentialId ? "✓" : "1"}
+      {passkeyCredentials?.credentialId && (
+        <div className="step-header">
+          <div className="step-icon-completed">✓</div>
+          <div className="step-header-content">
+            <div>
+              <div
+                id="home-create-key"
+                className="step-title"
+              >
+                {t("home.keyCreated")}
+              </div>
+              <div className="credential-id">
+                {t("home.credentialID")} <code>{passkeyCredentials.credentialId}</code>
+              </div>
+            </div>
+            <button
+              id="resetPasskeyBtn"
+              className="secondary small"
+              onClick={() => handleResetPasskey(t("home.resetPasskeyAlert"))}
+            >
+              {t("home.resetPasskeyBtn")}
+            </button>
+          </div>
         </div>
-        <div
-          id="home-create-key"
-          className="step-title"
-        >
-          {t("home.createKey")}
-        </div>
-      </div>
+      )}
 
       {!passkeyCredentials?.credentialId && (
         <form
           id="passkey-input"
           onSubmit={handleCreatePasskey}
         >
+          <div
+            id="home-user-name"
+            className="step-title"
+            style={{ marginBottom: 16 }}
+          >
+            {t("home.userName")}
+          </div>
           <div className="form-group">
-            <label
-              id="home-user-name"
-              htmlFor="userName"
-            >
-              {t("home.userName")}
-            </label>
             <input
               type="text"
               id="userName"
-              placeholder="interop-passkey"
+              placeholder="my-wallet"
               onChange={(e) => setPasskeyName(e.target.value)}
             />
           </div>
@@ -82,35 +94,6 @@ export function CreatePasskey({ setPasskeyCredentials, passkeyCredentials }: Pro
             {passkeyBtnDisabled ? t("home.creating") : t("home.createPasskeyBtn")}
           </button>
         </form>
-      )}
-
-      {passkeyCredentials?.credentialId && (
-        <div
-          id="passkey-success"
-          className="alert alert-success"
-        >
-          {/*
-           */}
-          <strong id="home-key-created">{t("home.keyCreated")}</strong>
-          <div className="info-row">
-            <span
-              id="home-credential-id"
-              className="info-label"
-            >
-              {t("home.credentialID")}
-            </span>
-            <span className="info-value">
-              <code id="credentialIdDisplay">{passkeyCredentials.credentialId}</code>
-            </span>
-          </div>
-          <button
-            id="resetPasskeyBtn"
-            className="secondary small"
-            onClick={handleResetPasskey}
-          >
-            {t("home.resetPasskeyBtn")}
-          </button>
-        </div>
       )}
 
       {creationError && (

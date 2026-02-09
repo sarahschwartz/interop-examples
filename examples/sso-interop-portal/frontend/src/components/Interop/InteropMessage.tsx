@@ -1,8 +1,10 @@
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Hex } from "viem";
 
 import { sendInteropMessage } from "~/utils/l2-interop/interop-messages";
+
+import { Spinner } from "../Earn/Spinner";
 
 interface Props {
   networksDetected: boolean;
@@ -39,9 +41,10 @@ export function InteropMessage({ networksDetected }: Props) {
       const info = await sendInteropMessage(message, isAToB, onProgress);
       setTxInfo(info);
       setIsSuccess(true);
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.log("Error sending tokens: ", error, typeof error);
-      setError(typeof error === "string" ? error : "unknown error");
+      setError(error.message && typeof error.message === "string" ? error.message : "unknown error");
     } finally {
       setIsSending(false);
     }
@@ -51,68 +54,79 @@ export function InteropMessage({ networksDetected }: Props) {
     setProgress((prev) => [...prev, step]);
   }
 
-  function handleDirectionChange(e: ChangeEvent<HTMLSelectElement>) {
-    if (e.target.value === "a-to-b") {
-      setIsAToB(true);
-    } else {
-      setIsAToB(false);
-    }
-  }
-
   return (
     <>
+      <div
+        id="interop-send-msg-label"
+        className="tab-title"
+        style={{ marginTop: "8px", marginBottom: "16px" }}
+      >
+        {t("interop.sendMsgLabel")}
+      </div>
       <div className="card">
-        <div
-          id="interop-send-msg-label"
-          className="card-title"
-        >
-          {t("interop.sendMsgLabel")}
-        </div>
         <form
           id="interop-form"
           onSubmit={handleSubmit}
         >
-          <div className="form-group">
-            <label
-              id="interop-msg-label"
-              htmlFor="interopMessage"
+          <div className="form-row">
+            <div
+              className="form-group"
+              style={{ flex: 1 }}
             >
-              {t("interop.msgLabel")}
-            </label>
-            <input
-              type="text"
-              id="interopMessage"
-              placeholder="hello interop"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-          </div>
+              <label
+                id="interop-msg-label"
+                htmlFor="interopMessage"
+              >
+                {t("interop.msgLabel")}
+              </label>
+              <input
+                type="text"
+                id="interopMessage"
+                placeholder="hello interop"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </div>
 
-          <div className="form-group">
-            <label
-              id="interop-msg-direction"
-              htmlFor="interopMessageDirection"
+            <div
+              className="form-group"
+              style={{ flexShrink: 0 }}
             >
-              {t("interop.msgDirection")}
-            </label>
-            <select
-              id="interopMessageDirection"
-              className="interop-direction-box"
-              onChange={handleDirectionChange}
-            >
-              <option
-                id="interop-a-to-b"
-                value="a-to-b"
-              >
-                {t("interop.aToB")}
-              </option>
-              <option
-                id="interop-b-to-a"
-                value="b-to-a"
-              >
-                {t("interop.bToA")}
-              </option>
-            </select>
+              <label id="interop-msg-direction">{t("interop.msgDirection")}</label>
+              <div className="direction-swap">
+                <span className="direction-chain">
+                  <span className="direction-label">From</span>{" "}
+                  {isAToB ? t("interop.chainA").replace(":", "") : t("interop.chainB").replace(":", "")}
+                </span>
+                <button
+                  type="button"
+                  className="swap-btn secondary-brand"
+                  onClick={() => setIsAToB(!isAToB)}
+                  aria-label="Swap direction"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7 16L3 12M3 12L7 8M3 12H21M17 8L21 12M21 12L17 16M21 12H3"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="swap-text">Swap</span>
+                </button>
+                <span className="direction-chain">
+                  <span className="direction-label">To</span>{" "}
+                  {isAToB ? t("interop.chainB").replace(":", "") : t("interop.chainA").replace(":", "")}
+                </span>
+              </div>
+            </div>
           </div>
 
           <button
@@ -127,10 +141,16 @@ export function InteropMessage({ networksDetected }: Props) {
         {isSending && (
           <div
             id="interop-progress"
-            className="alert alert-info"
+            className="progress-section"
           >
-            <strong id="interopProgressTitle">{t("interop.msgProgressTitle")}</strong>
-            <div id="interopProgressSteps">
+            <div className="progress-title">
+              <Spinner />
+              <span id="interopProgressTitle">Sending message...</span>
+            </div>
+            <div
+              id="interopProgressSteps"
+              className="progress-steps"
+            >
               {progress.map((step, i) => (
                 <div key={i}>{step}</div>
               ))}
@@ -141,10 +161,15 @@ export function InteropMessage({ networksDetected }: Props) {
         {isSuccess && (
           <div
             id="interop-success"
-            className="alert alert-success"
+            className="success-section"
           >
-            <strong id="interop-msg-verified">{t("interop.msgVerified")}</strong>
-            <div className="info-row">
+            <div
+              className="success-title"
+              id="interop-msg-verified"
+            >
+              {t("interop.msgVerified")}
+            </div>
+            <div className="success-row">
               <span
                 id="interop-src-chain-tx"
                 className="info-label"
@@ -155,7 +180,7 @@ export function InteropMessage({ networksDetected }: Props) {
                 <code id="interopTxHashSource">{txInfo?.txHash}</code>
               </span>
             </div>
-            <div className="info-row">
+            <div className="success-row">
               <span
                 id="interop-msg-text"
                 className="info-label"
@@ -166,7 +191,7 @@ export function InteropMessage({ networksDetected }: Props) {
                 <code id="interopMessageText">{txInfo?.message}</code>
               </span>
             </div>
-            <div className="info-row">
+            <div className="success-row">
               <span
                 id="interop-msg-final-direction"
                 className="info-label"
@@ -177,7 +202,7 @@ export function InteropMessage({ networksDetected }: Props) {
                 <span id="interopMessageDirectionValue">{txInfo?.isAToB ? t("interop.aToB") : t("interop.bToA")}</span>
               </span>
             </div>
-            <div className="info-row">
+            <div className="success-row">
               <span
                 id="interop-msg-verified-on-dest"
                 className="info-label"
@@ -186,7 +211,7 @@ export function InteropMessage({ networksDetected }: Props) {
               </span>
               <span
                 id="interop-msg-success"
-                className="info-value"
+                className="info-value success-text"
               >
                 {t("interop.msgSuccess")}
               </span>

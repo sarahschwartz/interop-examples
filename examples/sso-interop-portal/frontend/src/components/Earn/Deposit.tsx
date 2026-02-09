@@ -6,6 +6,8 @@ import type { UseBalanceReturnType } from "wagmi";
 import { depositToAave } from "~/utils/l1-interop/aave-txns";
 import type { PasskeyCredential } from "~/utils/types";
 
+import { Spinner } from "./Spinner";
+
 interface Props {
   balance: UseBalanceReturnType;
   triggerRefresh: () => void;
@@ -17,9 +19,7 @@ interface Props {
 export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredentials, triggerRefresh }: Props) {
   const [depositAmount, setDepositAmount] = useState<string>("0");
   const [isSending, setIsSending] = useState<boolean>(false);
-  const [depositSuccess, setDepositSuccess] = useState<boolean>(false);
   const [depositError, setDepositError] = useState<string>();
-  const [txHash, setTxHash] = useState<string>();
 
   const { t } = useTranslation();
 
@@ -47,22 +47,20 @@ export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredent
 
   async function depositETH(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setTxHash(undefined);
     setIsSending(true);
-    setDepositSuccess(false);
     setDepositError(undefined);
-    const amount = depositAmount === "" ? undefined : parseEther(depositAmount);
-    if (!shadowAccount || !amount || !passkeyCredentials || !accountAddress) return;
     try {
+      const amount = depositAmount === "" ? undefined : parseEther(depositAmount);
+      if (!shadowAccount || !passkeyCredentials || !accountAddress) throw new Error("missing account info");
+      if (!amount) throw new Error("invalid amount");
       console.log("Depositing ETH");
-      const hash = await depositToAave(amount, shadowAccount, accountAddress, passkeyCredentials);
-      setTxHash(hash);
-      setDepositSuccess(true);
+      await depositToAave(amount, shadowAccount, accountAddress, passkeyCredentials);
       balance.refetch();
       triggerRefresh();
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.log("Error depositing ETH:", error);
-      setDepositError(typeof error === "string" ? error : "unknown error");
+      setDepositError(error.message && typeof error.message === "string" ? error.message : "unknown error");
     } finally {
       setIsSending(false);
     }
@@ -70,85 +68,53 @@ export function Deposit({ balance, shadowAccount, accountAddress, passkeyCredent
 
   return (
     <div className="card">
-      <div
-        id="earn-deposit-label"
-        className="card-title"
-      >
-        {t("earn.depositLabel")}
-      </div>
       <form
         id="aave-deposit-form"
         onSubmit={depositETH}
       >
         <div className="form-group">
-          <label
-            id="earn-deposit-amount"
-            htmlFor="aaveDepositAmount"
-          >
-            {t("earn.depositAmount")}
-          </label>
-          <div className="send-form-container">
-            <input
-              type="number"
-              id="aaveDepositAmount"
-              step="0.001"
-              placeholder="0.01"
-              min="0"
-              value={depositAmount}
-              disabled={btnsDisabled || isSending}
-              onChange={handleDepositAmountChange}
-            />
-            <button
-              className="maxBtn"
-              type="button"
-              disabled={btnsDisabled || isSending}
-              onClick={handleMaxDeposit}
+          <div className="label-row">
+            <label
+              id="earn-deposit-amount"
+              htmlFor="aaveDepositAmount"
+            >
+              {t("earn.depositAmount")}
+            </label>
+            <span
+              className="max-link"
+              onClick={btnsDisabled || isSending ? undefined : handleMaxDeposit}
+              role="button"
+              tabIndex={btnsDisabled || isSending ? -1 : 0}
             >
               Max
-            </button>
+            </span>
           </div>
+          <input
+            type="number"
+            id="aaveDepositAmount"
+            step="any"
+            placeholder="0.01"
+            min="0"
+            value={depositAmount}
+            disabled={btnsDisabled || isSending}
+            onChange={handleDepositAmountChange}
+          />
         </div>
         <button
           id="aaveDepositBtn"
           disabled={btnsDisabled || isSending}
           type="submit"
         >
-          {isSending ? t("earn.depositing") : t("earn.depositBtn")}
+          {isSending ? (
+            <span className="deploying-content">
+              <Spinner />
+              {t("earn.depositing")}
+            </span>
+          ) : (
+            t("earn.depositBtn")
+          )}
         </button>
       </form>
-
-      {depositSuccess && (
-        <div
-          id="aave-deposit-success"
-          className="alert alert-success"
-        >
-          <strong id="earn-deposit-init">{t("earn.depositInit")}</strong>
-          <div className="info-row">
-            <span
-              id="earn-deposit-tx"
-              className="info-label"
-            >
-              {t("earn.depositTx")}
-            </span>
-            <span className="info-value">
-              <a
-                id="transfer-tx-link"
-                href={`https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev/tx/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <code id="aaveDepositTxHash">{txHash}</code>
-              </a>
-            </span>
-          </div>
-          <div
-            id="earn-deposit-wait-msg"
-            className="alert-info earn-wait-msg"
-          >
-            {t("earn.depositWaitMsg")}
-          </div>
-        </div>
-      )}
 
       {depositError && (
         <div

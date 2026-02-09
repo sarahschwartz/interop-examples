@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useEffect } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Address } from "viem";
 import type { UseBalanceReturnType } from "wagmi";
@@ -32,6 +32,7 @@ export function HomeTab({
   balance,
   isMounted,
 }: Props) {
+  const [justActivated, setJustActivated] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -39,6 +40,11 @@ export function HomeTab({
     if (savedPasskey) setPasskeyCredentials(savedPasskey);
     if (savedAccount) setAccountAddress(savedAccount);
   }, []);
+
+  function handleAccountDeployed(address: Address) {
+    setJustActivated(true);
+    setAccountAddress(address);
+  }
 
   return (
     <div
@@ -49,7 +55,7 @@ export function HomeTab({
         <>
           {!passkeyCredentials || !accountAddress ? (
             <div id="setup-section">
-              <div className="card">
+              <div style={{ padding: "24px 0" }}>
                 <div
                   id="home-get-started"
                   className="card-title"
@@ -73,7 +79,7 @@ export function HomeTab({
               {/* <!-- Step 2: Deploy Account --> */}
               <DeployAccount
                 passkeyCredentials={passkeyCredentials}
-                setAccountAddress={setAccountAddress}
+                setAccountAddress={handleAccountDeployed}
               />
             </div>
           ) : (
@@ -82,6 +88,8 @@ export function HomeTab({
               shadowAccount={shadowAccount!}
               balance={balance}
               setActiveTab={setActiveTab}
+              justActivated={justActivated}
+              setJustActivated={setJustActivated}
             />
           )}
         </>

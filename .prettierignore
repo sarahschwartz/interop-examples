@@ -23,3 +23,5 @@ deployments-zk
 **/ignition/deployments/**
 **/artifacts/**
 **/cache/**
+zksync-os-server
+txn-state

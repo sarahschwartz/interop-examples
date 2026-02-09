@@ -5,22 +5,28 @@ import { sepolia } from "viem/chains";
 import { type UseBalanceReturnType, useReadContract } from "wagmi";
 
 import { AAVE_CONTRACTS, STATUS_ENDPOINT } from "~/utils/constants";
+import type { Tab } from "~/utils/tabs";
 import type { FinalizedTxnState, PasskeyCredential, PendingTxnState } from "~/utils/types";
 
+import { BackButton } from "../BackButton";
 import { ActivityTab } from "./Activity";
 import { Deposit } from "./Deposit";
 import { Withdraw } from "./Withdraw";
+
+type EarnSubTab = "deposit" | "withdraw";
 
 interface Props {
   accountAddress?: Address;
   shadowAccount?: Address;
   balance: UseBalanceReturnType;
   passkeyCredentials?: PasskeyCredential;
+  setActiveTab: (next: Tab) => void;
 }
 
-export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredentials }: Props) {
+export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredentials, setActiveTab }: Props) {
   const [pendingTxns, setPendingTxns] = useState<PendingTxnState[]>([]);
   const [finalizedTxns, setFinalizedTxns] = useState<FinalizedTxnState[]>([]);
+  const [activeSubTab, setActiveSubTab] = useState<EarnSubTab>("deposit");
   const [refreshTick, setRefreshTick] = useState(0);
   const triggerRefresh = () => setRefreshTick((x) => x + 1);
 
@@ -73,27 +79,28 @@ export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredent
       className="tab-content"
       id="earn-tab"
     >
-      <div className="card">
+      <div className="tab-header">
+        <BackButton setActiveTab={setActiveTab} />
         <div
           id="earn-title"
-          className="card-title"
+          className="tab-title"
         >
           {t("earn.title")}
         </div>
-        <div
-          id="earn-subtitle"
-          className="card-subtitle"
-        >
-          {t("earn.subtitle")}
-        </div>
       </div>
+      <p
+        id="earn-subtitle"
+        className="tab-description"
+      >
+        {t("earn.subtitle")}
+      </p>
 
       {shadowAccount && (
         <div
           id="aave-balance-section"
-          className="card"
+          className="aave-info"
         >
-          <div className="info-row">
+          <div className="aave-info-row">
             <span
               id="earn-shadow"
               className="info-label"
@@ -110,43 +117,62 @@ export function EarnTab({ accountAddress, shadowAccount, balance, passkeyCredent
               </a>
             </span>
           </div>
-          <div className="info-row">
+          <div className="aave-info-row">
             <span
               id="earn-deposits"
               className="info-label"
             >
               {t("earn.deposits")}
+              <button
+                id="refreshAaveBalanceBtn"
+                className="refresh-btn-inline"
+                onClick={() => aaveBalance.refetch()}
+              >
+                {t("earn.refreshBtn")}
+              </button>
             </span>
             <span className="info-value">
               <span id="aaveBalanceDisplay">{aaveBalance.data ? formatEther(aaveBalance.data) : "0"}</span> aETH
             </span>
           </div>
-          <button
-            id="refreshAaveBalanceBtn"
-            className="secondary small"
-            onClick={() => aaveBalance.refetch()}
-          >
-            {t("earn.refreshBtn")}
-          </button>
         </div>
       )}
 
-      <Deposit
-        shadowAccount={shadowAccount}
-        balance={balance}
-        passkeyCredentials={passkeyCredentials}
-        accountAddress={accountAddress}
-        triggerRefresh={triggerRefresh}
-      />
+      <div className="earn-tabs">
+        <button
+          className={`earn-tab-btn ${activeSubTab === "deposit" ? "active" : ""}`}
+          onClick={() => setActiveSubTab("deposit")}
+        >
+          {t("earn.depositLabel")}
+        </button>
+        <button
+          className={`earn-tab-btn ${activeSubTab === "withdraw" ? "active" : ""}`}
+          onClick={() => setActiveSubTab("withdraw")}
+        >
+          {t("earn.withdrawLabel")}
+        </button>
+      </div>
 
-      <Withdraw
-        shadowAccount={shadowAccount}
-        aaveBalance={aaveBalance}
-        balance={balance}
-        passkeyCredentials={passkeyCredentials}
-        accountAddress={accountAddress}
-        triggerRefresh={triggerRefresh}
-      />
+      {activeSubTab === "deposit" && (
+        <Deposit
+          shadowAccount={shadowAccount}
+          balance={balance}
+          passkeyCredentials={passkeyCredentials}
+          accountAddress={accountAddress}
+          triggerRefresh={triggerRefresh}
+        />
+      )}
+
+      {activeSubTab === "withdraw" && (
+        <Withdraw
+          shadowAccount={shadowAccount}
+          aaveBalance={aaveBalance}
+          balance={balance}
+          passkeyCredentials={passkeyCredentials}
+          accountAddress={accountAddress}
+          triggerRefresh={triggerRefresh}
+        />
+      )}
 
       <ActivityTab
         pendingTxns={pendingTxns}

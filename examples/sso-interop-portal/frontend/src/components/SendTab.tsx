@@ -4,15 +4,19 @@ import { type Address, formatEther, isAddress, parseEther } from "viem";
 import type { UseBalanceReturnType } from "wagmi";
 
 import { sendETH } from "~/utils/sso/transfer";
+import type { Tab } from "~/utils/tabs";
 import type { PasskeyCredential } from "~/utils/types";
+
+import { BackButton } from "./BackButton";
 
 interface Props {
   accountAddress?: Address;
   balance: UseBalanceReturnType;
   passkeyCredentials?: PasskeyCredential;
+  setActiveTab: (next: Tab) => void;
 }
 
-export function SendTab({ accountAddress, balance, passkeyCredentials }: Props) {
+export function SendTab({ accountAddress, balance, passkeyCredentials, setActiveTab }: Props) {
   const [amount, setAmount] = useState<string>("0");
   const [recipient, setRecipient] = useState<string>();
   const [transferError, setTransferError] = useState<string>();
@@ -64,10 +68,11 @@ export function SendTab({ accountAddress, balance, passkeyCredentials }: Props) 
       setTxHash(hash);
       setIsSuccess(true);
       balance.refetch();
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.log("Error sending transfer:", error);
       setTransferError("transferFailed");
-      setError(typeof error === "string" ? error : "Unknown error");
+      setError(error.message && typeof error.message === "string" ? error.message : "unknown error");
     } finally {
       setIsSending(false);
     }
@@ -78,14 +83,16 @@ export function SendTab({ accountAddress, balance, passkeyCredentials }: Props) 
       className="tab-content"
       id="send-tab"
     >
-      <div className="card">
+      <div className="tab-header">
+        <BackButton setActiveTab={setActiveTab} />
         <div
           id="send-money"
-          className="card-title"
+          className="tab-title"
         >
           {t("send.sendMoney")}
         </div>
-
+      </div>
+      <div className="card">
         <form
           onSubmit={handleSubmit}
           id="transfer-form"
@@ -106,32 +113,32 @@ export function SendTab({ accountAddress, balance, passkeyCredentials }: Props) 
           </div>
 
           <div className="form-group">
-            <label
-              id="send-amount"
-              htmlFor="transferAmount"
-            >
-              {t("send.amount")}
-            </label>
-            <div className="send-form-container">
-              <input
-                type="number"
-                id="transferAmount"
-                step="0.001"
-                min="0"
-                placeholder="0.01"
-                value={amount}
-                onChange={handleAmountChange}
-                disabled={btnsDisabled || isSending}
-              />
-              <button
-                className="maxBtn"
-                type="button"
-                disabled={btnsDisabled || isSending}
-                onClick={handleMax}
+            <div className="label-row">
+              <label
+                id="send-amount"
+                htmlFor="transferAmount"
+              >
+                {t("send.amount")}
+              </label>
+              <span
+                className="max-link"
+                onClick={btnsDisabled || isSending ? undefined : handleMax}
+                role="button"
+                tabIndex={btnsDisabled || isSending ? -1 : 0}
               >
                 Max
-              </button>
+              </span>
             </div>
+            <input
+              type="number"
+              id="transferAmount"
+              min="0"
+              step="any"
+              placeholder="0.01"
+              value={amount}
+              onChange={handleAmountChange}
+              disabled={btnsDisabled || isSending}
+            />
           </div>
 
           <button

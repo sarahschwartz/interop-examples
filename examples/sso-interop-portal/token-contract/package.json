@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "compile": "hardhat compile",
-    "deploy-usd": "hardhat ignition deploy ignition/modules/TestUSD.ts --network localZKsyncChain"
+    "deploy-usd": "rm -rf ignition/deployments && hardhat ignition deploy ignition/modules/TestUSD.ts --network localZKsyncChain"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition": "^3.0.7",

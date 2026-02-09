@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Address } from "viem";
 import { useBalance } from "wagmi";
 
+import { Background } from "./components/Background";
 import { EarnTab } from "./components/Earn/EarnTab";
 import { Header } from "./components/Header";
 import { HomeTab } from "./components/Home/HomeTab";
 import { InteropTab } from "./components/Interop/InteropTab";
-import { Navigation } from "./components/Navigation";
 import { SendTab } from "./components/SendTab";
-import { SHOW_INTEROP, zksyncOsTestnet } from "./utils/constants";
+import { SHOW_INTEROP, STORAGE_KEY_LANGUAGE, zksyncOsTestnet } from "./utils/constants";
 import { getShadowAccount } from "./utils/l1-interop/aave-utils";
 import { getTabFromUrl, setTabInUrl, type Tab } from "./utils/tabs";
 import type { PasskeyCredential } from "./utils/types";
@@ -19,6 +20,8 @@ function App() {
   const [accountAddress, setAccountAddress] = useState<Address>();
   const [activeTab, setActiveTab] = useState<Tab>(() => getTabFromUrl());
   const [shadowAccount, setShadowAccount] = useState<Address>();
+
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     async function updateShadowAccount(address: Address) {
@@ -35,8 +38,15 @@ function App() {
   });
 
   useEffect(() => {
+    async function updateLang(savedLanguage: string) {
+      await i18n.changeLanguage(savedLanguage);
+    }
     if (typeof window !== "undefined") {
       setIsMounted(true);
+      const savedLanguage = localStorage.getItem(STORAGE_KEY_LANGUAGE);
+      if (savedLanguage) {
+        updateLang(savedLanguage);
+      }
       const onPopState = () => setActiveTab(getTabFromUrl());
       window.addEventListener("popstate", onPopState);
       return () => window.removeEventListener("popstate", onPopState);
@@ -50,12 +60,13 @@ function App() {
 
   return (
     <>
-      <Header balance={balance} />
+      <Background />
+      <Header
+        balance={balance}
+        accountAddress={accountAddress}
+        activeTab={activeTab}
+      />
       <div className="container">
-        <Navigation
-          activeTab={activeTab}
-          setActiveTab={setTab}
-        />
         <div style={{ display: activeTab === "Home" ? "block" : "none" }}>
           <HomeTab
             accountAddress={accountAddress}
@@ -74,6 +85,7 @@ function App() {
             accountAddress={accountAddress}
             balance={balance}
             passkeyCredentials={passkeyCredentials}
+            setActiveTab={setTab}
           />
         </div>
 
@@ -83,12 +95,13 @@ function App() {
             shadowAccount={shadowAccount}
             balance={balance}
             passkeyCredentials={passkeyCredentials}
+            setActiveTab={setTab}
           />
         </div>
 
         {SHOW_INTEROP && (
           <div style={{ display: activeTab === "Interop" ? "block" : "none" }}>
-            <InteropTab />
+            <InteropTab setActiveTab={setTab} />
           </div>
         )}
       </div>

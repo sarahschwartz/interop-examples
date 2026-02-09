@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 
 import type { FinalizedTxnState, PendingTxnState } from "~/utils/types";
 
+import { PendingProgressBar } from "./ProgressBar";
+
 interface Props {
   pendingTxns: PendingTxnState[];
   finalizedTxns: FinalizedTxnState[];
@@ -16,13 +18,17 @@ export function ActivityTab({ pendingTxns, finalizedTxns }: Props) {
         className="tab-content"
         id="activity-tab"
       >
-        <div className="card">
-          <div
-            id="activity-title"
-            className="card-title"
-          >
-            {t("earn.activity")}
-          </div>
+        <div
+          id="activity-title"
+          className="tab-title"
+          style={{ marginBottom: "16px" }}
+        >
+          {t("earn.activity")}
+        </div>
+        <div
+          className="card"
+          style={{ paddingTop: "16px" }}
+        >
           <table
             className="tx-table"
             id="pending-txns-list"
@@ -32,7 +38,7 @@ export function ActivityTab({ pendingTxns, finalizedTxns }: Props) {
                 <th>{t("earn.action")}</th>
                 <th>{t("earn.depositAmount")}</th>
                 <th>{t("earn.status")}</th>
-                <th>{t("earn.finalizedAt")}</th>
+                <th>{t("earn.transaction")}</th>
               </tr>
             </thead>
             <tbody>
@@ -41,9 +47,18 @@ export function ActivityTab({ pendingTxns, finalizedTxns }: Props) {
                   <td>{tx.action}</td>
                   <td className="tx-amount">{tx.amount}</td>
                   <td>
-                    <span className="tx-status tx-status--pending">{t("earn.pending")}</span>
+                    <PendingProgressBar addedAt={tx.addedAt} />
                   </td>
-                  <td>--</td>
+                  <td>
+                    <a
+                      className="tx-link"
+                      href={`https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev/tx/${tx.hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {tx.hash.slice(0, 6)}...{tx.hash.slice(-4)}
+                    </a>
+                  </td>
                 </tr>
               ))}
               {finalizedTxns.map((tx) => (
@@ -51,9 +66,20 @@ export function ActivityTab({ pendingTxns, finalizedTxns }: Props) {
                   <td>{t(`earn.${tx.action === "Deposit" ? "depositLabel" : "withdrawLabel"}`)}</td>
                   <td className="tx-amount">{parseFloat(tx.amount).toFixed(4)}</td>
                   <td>
-                    <span className="tx-status tx-status--success">{t("earn.finalized")}</span>
+                    <span className="tx-status tx-status--success">
+                      {t("earn.finalizedAt")} {new Date(tx.finalizedAt).toLocaleString()}
+                    </span>
                   </td>
-                  <td className="tx-date">{new Date(tx.finalizedAt).toLocaleString()}</td>
+                  <td>
+                    <a
+                      className="tx-link"
+                      href={`https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev/tx/${tx.l2TxHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {tx.l2TxHash.slice(0, 6)}...{tx.l2TxHash.slice(-4)}
+                    </a>
+                  </td>
                 </tr>
               ))}
             </tbody>

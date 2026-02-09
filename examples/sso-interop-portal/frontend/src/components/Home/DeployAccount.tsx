@@ -6,7 +6,7 @@ import { DEPLOY_ACCOUNT_ENDPOINT } from "~/utils/constants";
 import { saveAccountAddress } from "~/utils/sso/passkeys";
 import type { DeployAccountArgs, PasskeyCredential } from "~/utils/types";
 
-import { DeployingButton } from "./DeployingButton";
+import { Spinner } from "../Earn/Spinner";
 
 interface Props {
   setAccountAddress: (address: Address) => void;
@@ -90,7 +90,16 @@ export function DeployAccount({ passkeyCredentials, setAccountAddress }: Props) 
     >
       {isDeploying ? (
         <div className="deploying-progress">
-          <DeployingButton />
+          <button
+            id="deployAccountBtn"
+            className="deploy-btn"
+            disabled={true}
+          >
+            <span className="deploying-content">
+              <Spinner />
+              {t("home.deploying")}
+            </span>
+          </button>
           <p
             className="deploying-step-text"
             key={currentStep}

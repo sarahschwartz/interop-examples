@@ -68,6 +68,7 @@ export function SendTab({ accountAddress, balance, passkeyCredentials, setActive
       setTxHash(hash);
       setIsSuccess(true);
       balance.refetch();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("Error sending transfer:", error);
       setTransferError("transferFailed");

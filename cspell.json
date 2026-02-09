@@ -42,7 +42,9 @@
     "passkey-wallet-app/abis/**",
     "passkey-wallet-app/token-deployment/**",
     "passkey-wallet-app/translation.js",
-    "l2-to-l1-relayer/abis/**"
+    "l2-to-l1-relayer/abis/**",
+    "**/components/Earn/Spinner.tsx",
+    "**/zksync-os-server/"
   ],
   "caseSensitive": true,
   "dictionaries": [

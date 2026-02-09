@@ -20,6 +20,7 @@ export default [
       "**/deployments-zk/",
       "**/cache-zk/",
       "**/typechain-types/",
+      "**/zksync-os-server/",
     ],
   },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },

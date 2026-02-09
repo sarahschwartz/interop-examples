@@ -11,3 +11,5 @@ config:
 gitignore: true
 ignores:
   - ".github/**/*.md"
+  - "zksync-os-server/**/*.md"
+  - "zksync-os-server/*.md"

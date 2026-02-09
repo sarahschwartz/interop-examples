@@ -70,6 +70,7 @@ export function Withdraw({
       await withdrawFromAave(amount, shadowAccount, accountAddress, passkeyCredentials);
       balance.refetch();
       triggerRefresh();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("Error withdrawing from Aave", error);
       setWithdrawError(error.message && typeof error.message === "string" ? error.message : "unknown error");

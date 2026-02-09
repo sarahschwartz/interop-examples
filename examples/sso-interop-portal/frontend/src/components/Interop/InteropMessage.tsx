@@ -41,6 +41,7 @@ export function InteropMessage({ networksDetected }: Props) {
       const info = await sendInteropMessage(message, isAToB, onProgress);
       setTxInfo(info);
       setIsSuccess(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("Error sending tokens: ", error, typeof error);
       setError(error.message && typeof error.message === "string" ? error.message : "unknown error");

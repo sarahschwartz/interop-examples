@@ -31,7 +31,6 @@ export function PendingProgressBar({ addedAt }: { addedAt: string }) {
       </div>
       <span className="pending-progress-text">
         {t("earn.pending")}
-        <span className="animated-dots" />
       </span>
     </div>
   );

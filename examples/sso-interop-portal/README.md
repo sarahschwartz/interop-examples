@@ -8,6 +8,7 @@ This example shows how to implement:
 - sending bundled transactions via the ZKsync SSO bundler
 - (Optional) local L2 <-> L2 interop for sending ERC20 tokens and arbitrary
   messages between chains
+- (Optional) use address aliases to send money from Sepolia L1 to an aliased account on L2
 
 ## How it works
 
@@ -193,6 +194,37 @@ file as a guide for your `.env` to enable the interop tab.
 #### Restart the frontend
 
 Restart the frontend app to see the interop tab enabled.
+
+### Running with address aliases
+
+#### Clone the alias demo backend
+
+```bash
+git clone https://github.com/sarahschwartz/alias-addresses-demo-backend
+```
+
+#### Run the alias backend
+
+Follow the instructions to configure the `.env` file and then start the backend services configured for testnet.
+
+#### Enable aliases in the frontend
+
+In your frontend `.env` file enable the `VITE_SHOW_ALIAS` variable
+and make sure the `VITE_RESOLVER_URL` is set to the correct port where the resolver service is running.
+
+#### Restart the frontend
+
+Restart the frontend app to see the alias tab enabled.
+
+#### Try using an alias
+
+On the "Receive" tab create a new alias for your account.
+Then on the "Send" tab look up your alias,
+copy the Sepolia L1 deposit address,
+and send some testnet ETH to the address on Sepolia testnet
+using any browser wallet.
+You will see the deposit status show on the frontend,
+and eventually see the balance received in your account.
 
 ## Known Issues
 

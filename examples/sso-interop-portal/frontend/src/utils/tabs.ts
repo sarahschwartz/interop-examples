@@ -1,4 +1,4 @@
-export const TABS = ["Home", "Send", "Earn", "Interop"] as const;
+export const TABS = ["Home", "Send", "Receive", "Earn", "Interop"] as const;
 export type Tab = (typeof TABS)[number];
 
 export function getTabFromUrl(): Tab {

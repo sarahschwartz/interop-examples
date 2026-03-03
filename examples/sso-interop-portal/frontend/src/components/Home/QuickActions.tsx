@@ -79,7 +79,7 @@ export function QuickActions({
         <div className="action-card">
           <img
             src="/ic-h-send.svg"
-            alt=""
+            alt="send-icon"
             className="action-card-icon"
           />
           <h3 className="action-card-title">{t("home.sendTitle")}</h3>
@@ -90,6 +90,24 @@ export function QuickActions({
             onClick={() => setActiveTab("Send")}
           >
             {t("home.quickSendBtn")}
+          </button>
+        </div>
+
+        <div className="action-card">
+          <img
+            src="/ic-h-send.svg"
+            alt="receive-icon"
+            className="action-card-icon"
+            id="receive-icon"
+          />
+          <h3 className="action-card-title">{t("home.receiveTitle")}</h3>
+          <p className="action-card-desc">{t("home.receiveDesc")}</p>
+          <button
+            id="quickReceiveBtn"
+            className="secondary-brand"
+            onClick={() => setActiveTab("Receive")}
+          >
+            {t("home.quickReceiveBtn")}
           </button>
         </div>
 

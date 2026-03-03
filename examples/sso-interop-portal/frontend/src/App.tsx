@@ -8,7 +8,8 @@ import { EarnTab } from "./components/Earn/EarnTab";
 import { Header } from "./components/Header";
 import { HomeTab } from "./components/Home/HomeTab";
 import { InteropTab } from "./components/Interop/InteropTab";
-import { SendTab } from "./components/SendTab";
+import { ReceiveTab } from "./components/ReceiveTab";
+import { SendTab } from "./components/Send/SendTab";
 import { SHOW_INTEROP, STORAGE_KEY_LANGUAGE, zksyncOsTestnet } from "./utils/constants";
 import { getShadowAccount } from "./utils/l1-interop/aave-utils";
 import { getTabFromUrl, setTabInUrl, type Tab } from "./utils/tabs";
@@ -85,6 +86,13 @@ function App() {
             accountAddress={accountAddress}
             balance={balance}
             passkeyCredentials={passkeyCredentials}
+            setActiveTab={setTab}
+          />
+        </div>
+
+        <div style={{ display: activeTab === "Receive" ? "block" : "none" }}>
+          <ReceiveTab
+            accountAddress={accountAddress}
             setActiveTab={setTab}
           />
         </div>

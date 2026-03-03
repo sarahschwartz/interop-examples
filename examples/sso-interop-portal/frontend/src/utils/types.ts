@@ -40,3 +40,37 @@ export interface PendingTxnState extends Metadata {
   updatedAt?: string;
   accountAddress: Address;
 }
+
+export type DepositEvent = {
+  id: number;
+  amount?: string | number | bigint;
+  attempts?: number;
+  stuck?: boolean;
+  status?: string;
+  l1TokenAddress?: string;
+  kind?: string;
+  createdAt?: number;
+};
+
+export type DepositRequestData = {
+  trackingId: string;
+  l1DepositAddress: string;
+  l2VaultAddress?: string;
+};
+
+export type StepperStep = "deposit" | "bridge" | "finalize" | "complete";
+
+export type DepositRow = {
+  alias?: string;
+  trackingId: string;
+  l1DepositAddressY: string;
+  l2VaultAddressX: string;
+  recipientPrividiumAddress?: string;
+  events?: DepositEvent[];
+};
+
+export type GroupedDeposit = {
+  address: string;
+  alias: string;
+  rows: DepositRow[];
+};

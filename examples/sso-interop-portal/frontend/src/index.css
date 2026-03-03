@@ -349,7 +349,7 @@ button.disconnect-item:hover svg {
 
 /* Aave deposits wrapper and badge */
 .action-card-wrapper {
-  width: calc((100% - 32px) / 3);
+  width: 100%;
   flex: none;
   position: relative;
   display: flex;
@@ -385,14 +385,14 @@ button.disconnect-item:hover svg {
 
 /* Action cards grid */
 .quick-actions-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
-  justify-content: center;
   align-items: flex-end;
 }
 
 .action-card {
-  width: calc((100% - 32px) / 3);
+  width: 100%;
   flex: none;
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(255, 255, 255, 1);
@@ -1417,4 +1417,225 @@ button.earn-tab-btn.active:hover:not(:disabled) {
 
 .max-link:hover {
   color: #050a70;
+}
+
+/* Receive tab */
+.receive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.receive-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.receive-actions button {
+  width: auto;
+}
+
+.receive-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  color: #070ea0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.receive-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.receive-group-card {
+  margin-bottom: 0;
+}
+
+.receive-group-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.receive-group-label {
+  font-size: 13px;
+  color: #555a66;
+}
+
+.receive-group-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262b33;
+}
+
+.receive-group-address {
+  font-size: 13px;
+  color: #555a66;
+}
+
+.receive-group-table-wrapper {
+  overflow-x: auto;
+}
+
+.receive-stuck-row {
+  background: #fff5f5;
+}
+
+.receive-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.receive-badge--default {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.receive-badge--pending {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.receive-badge--success {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.receive-badge--error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.receive-tech-details {
+  margin-top: 16px;
+}
+
+.receive-tech-details summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: #555a66;
+}
+
+.receive-tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.receive-tech-item {
+  background: #f7f9fc;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 13px;
+  color: #262b33;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .receive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Send alias section */
+.send-section-title {
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.send-alias-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.send-alias-input-row input {
+  flex: 1;
+}
+
+.send-alias-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.send-alias-progress {
+  margin-top: 8px;
+}
+
+.send-alias-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.send-alias-step {
+  border: 1px solid #dadde5;
+  background: #f7f9fc;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.send-alias-step.current {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.send-alias-step.complete {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.send-alias-step-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #262b33;
+}
+
+.send-alias-step-state {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #555a66;
+}
+
+@media (max-width: 768px) {
+  .send-alias-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .send-alias-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+#receive-icon{
+  transform: rotate(180deg);
+}
+
+.step-number{
+  font-weight: bold;
+}
+
+.alias-step{
+  margin-bottom: 10px;
 }

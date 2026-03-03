@@ -7,23 +7,35 @@ export const STORAGE_KEY_PASSKEY = "zksync_sso_passkey";
 export const STORAGE_KEY_ACCOUNT = "zksync_sso_account";
 export const STORAGE_KEY_LANGUAGE = "zksync-interop-demo-language";
 
-export const BUNDLER_URL = "https://bundler-api.stage-sso.zksync.dev";
+function envAddress(value: string | undefined, fallback: `0x${string}`): `0x${string}` {
+  return (value || fallback) as `0x${string}`;
+}
+
+const ZKSYNC_OS_CHAIN_ID = Number(import.meta.env?.VITE_ZKSYNC_OS_CHAIN_ID || 8022833);
+const ZKSYNC_OS_EXPLORER_URL =
+  import.meta.env?.VITE_ZKSYNC_OS_EXPLORER_URL || "https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev";
+
+export const BUNDLER_URL = import.meta.env?.VITE_BUNDLER_URL || "https://bundler-api.stage-sso.zksync.dev";
 
 export const BACKEND_URL = import.meta.env?.VITE_BACKEND_URL || "http://localhost:4340";
+export const RESOLVER_URL = import.meta.env?.VITE_RESOLVER_URL || "http://localhost:4000";
 export const STATUS_ENDPOINT = `${BACKEND_URL}/status`;
 export const DEPLOY_ACCOUNT_ENDPOINT = `${BACKEND_URL}/deploy-account`;
 export const FAUCET_ENDPOINT = `${BACKEND_URL}/faucet`;
 export const SUBMIT_INTEROP_TX_ENDPOINT = `${BACKEND_URL}/new-l1-interop-tx`;
-export const L2_EXPLORER_BASE = "https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev/tx/";
-export const L1_EXPLORER_BASE = "https://sepolia.etherscan.io/tx/";
+export const L2_EXPLORER_BASE = import.meta.env?.VITE_L2_EXPLORER_BASE || `${ZKSYNC_OS_EXPLORER_URL}/tx/`;
+export const L1_EXPLORER_BASE = import.meta.env?.VITE_L1_EXPLORER_BASE || "https://sepolia.etherscan.io/tx/";
 
-export const DEFAULT_ZKSYNC_OS_RPC_URL = "https://zksync-os-testnet-alpha.zksync.dev/";
+export const DEFAULT_ZKSYNC_OS_RPC_URL =
+  import.meta.env?.VITE_ZKSYNC_OS_RPC_URL || "https://zksync-os-testnet-alpha.zksync.dev/";
+export const DEFAULT_ZKSYNC_OS_WS_URL =
+  import.meta.env?.VITE_ZKSYNC_OS_WS_URL || "wss://zksync-os-testnet-alpha.zksync.dev/ws";
 
 export const SHOW_INTEROP = import.meta.env?.VITE_SHOW_INTEROP === "true";
 
 // ZKsync OS configuration
 export const zksyncOsTestnet = defineChain({
-  id: 8022833,
+  id: ZKSYNC_OS_CHAIN_ID,
   name: "ZKsync OS Developer Preview",
   nativeCurrency: {
     name: "Ether",
@@ -33,17 +45,17 @@ export const zksyncOsTestnet = defineChain({
   rpcUrls: {
     default: {
       http: [DEFAULT_ZKSYNC_OS_RPC_URL],
-      webSocket: ["wss://zksync-os-testnet-alpha.zksync.dev/ws"],
+      webSocket: [DEFAULT_ZKSYNC_OS_WS_URL],
     },
     public: {
       http: [DEFAULT_ZKSYNC_OS_RPC_URL],
-      webSocket: ["wss://zksync-os-testnet-alpha.zksync.dev/ws"],
+      webSocket: [DEFAULT_ZKSYNC_OS_WS_URL],
     },
   },
   blockExplorers: {
     default: {
       name: "ZKsync OS Explorer",
-      url: "https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev",
+      url: ZKSYNC_OS_EXPLORER_URL,
     },
   },
 });
@@ -61,14 +73,26 @@ export const L1_PUBLIC_CLIENT = createPublicClient({
 });
 
 export const ssoContracts = {
-  eoaValidator: "0xc6945fB9c35a5696E6FB0b23084B4409e2D945EA" as `0x${string}`,
-  webauthnValidator: "0xD52c9b1bA249f877C8492F64c096E37a8072982A" as `0x${string}`,
-  sessionValidator: "0x38Bf206f027B9c861643689CD516A3B00210586f" as `0x${string}`,
-  guardianExecutor: "0x4337768cB3eC57Dd2cb843eFb929B773B13322de" as `0x${string}`,
-  accountImplementation: "0x7235ea708874f733d70B604122BfC121468dFFF6" as `0x${string}`,
-  beacon: "0x1dEedcF23b6970C30B9d82e18F27B0844bF37838" as `0x${string}`,
-  factory: "0x121d7fB7D7B28eBcCf017A8175b8DD637C670BBc" as `0x${string}`,
-  entryPoint: "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108" as `0x${string}`,
+  eoaValidator: envAddress(import.meta.env?.VITE_SSO_EOA_VALIDATOR, "0xc6945fB9c35a5696E6FB0b23084B4409e2D945EA"),
+  webauthnValidator: envAddress(
+    import.meta.env?.VITE_SSO_WEBAUTHN_VALIDATOR,
+    "0xD52c9b1bA249f877C8492F64c096E37a8072982A",
+  ),
+  sessionValidator: envAddress(
+    import.meta.env?.VITE_SSO_SESSION_VALIDATOR,
+    "0x38Bf206f027B9c861643689CD516A3B00210586f",
+  ),
+  guardianExecutor: envAddress(
+    import.meta.env?.VITE_SSO_GUARDIAN_EXECUTOR,
+    "0x4337768cB3eC57Dd2cb843eFb929B773B13322de",
+  ),
+  accountImplementation: envAddress(
+    import.meta.env?.VITE_SSO_ACCOUNT_IMPLEMENTATION,
+    "0x7235ea708874f733d70B604122BfC121468dFFF6",
+  ),
+  beacon: envAddress(import.meta.env?.VITE_SSO_BEACON, "0x1dEedcF23b6970C30B9d82e18F27B0844bF37838"),
+  factory: envAddress(import.meta.env?.VITE_SSO_FACTORY, "0x121d7fB7D7B28eBcCf017A8175b8DD637C670BBc"),
+  entryPoint: envAddress(import.meta.env?.VITE_SSO_ENTRYPOINT, "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108"),
 };
 
 // TODO: use this once new SSO SDK is ready and add to .env.example
@@ -79,22 +103,22 @@ export const ssoContracts = {
 // Contract addresses on Sepolia (L1)
 export const AAVE_CONTRACTS: { [key: string]: `0x${string}` } = {
   // L2 Contract (ZKSync OS Testnet)
-  l2InteropCenter: "0xc64315efbdcD90B71B0687E37ea741DE0E6cEFac",
+  l2InteropCenter: envAddress(import.meta.env?.VITE_L2_INTEROP_CENTER, "0xc64315efbdcD90B71B0687E37ea741DE0E6cEFac"),
 
   // L1 Contracts (Sepolia)
-  aavePool: "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951",
-  aaveWeth: "0x387d311e47e80b498169e6fb51d3193167d89F7D", // Wrapped Token Gateway
-  aaveWethToken: "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c",
-  aToken: "0x5b071b590a59395fE4025A0Ccc1FcC931AAc1830",
-  ghoToken: "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60",
+  aavePool: envAddress(import.meta.env?.VITE_AAVE_POOL, "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951"),
+  aaveWeth: envAddress(import.meta.env?.VITE_AAVE_WETH_GATEWAY, "0x387d311e47e80b498169e6fb51d3193167d89F7D"),
+  aaveWethToken: envAddress(import.meta.env?.VITE_AAVE_WETH_TOKEN, "0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c"),
+  aToken: envAddress(import.meta.env?.VITE_AAVE_ATOKEN, "0x5b071b590a59395fE4025A0Ccc1FcC931AAc1830"),
+  ghoToken: envAddress(import.meta.env?.VITE_AAVE_GHO_TOKEN, "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60"),
 };
 
 export const BASE_TOKEN_ADDRESS: `0x${string}` = "0x000000000000000000000000000000000000800A";
 // ZKSync L1 Bridge address (Sepolia)
-export const BRIDGEHUB_ADDRESS = "0xc4FD2580C3487bba18D63f50301020132342fdbD";
+export const BRIDGEHUB_ADDRESS = envAddress(import.meta.env?.VITE_BRIDGEHUB_ADDRESS, "0xc4FD2580C3487bba18D63f50301020132342fdbD");
 
 // ZKSync Chain ID (ZKSync OS Testnet)
-export const L2_CHAIN_ID = 8022833n;
+export const L2_CHAIN_ID = BigInt(ZKSYNC_OS_CHAIN_ID);
 
 /* *********** L2 <-> L2 INTEROP CONSTANTS *********** */
 

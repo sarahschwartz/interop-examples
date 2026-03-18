@@ -12,7 +12,7 @@ function envAddress(value: string | undefined, fallback: `0x${string}`): `0x${st
 }
 
 const ZKSYNC_OS_CHAIN_ID = Number(import.meta.env?.VITE_ZKSYNC_OS_CHAIN_ID || 8022833);
-const ZKSYNC_OS_EXPLORER_URL =
+export const ZKSYNC_OS_EXPLORER_URL =
   import.meta.env?.VITE_ZKSYNC_OS_EXPLORER_URL || "https://zksync-os-testnet-alpha.staging-scan-v2.zksync.dev";
 
 export const BUNDLER_URL = import.meta.env?.VITE_BUNDLER_URL || "https://bundler-api.stage-sso.zksync.dev";

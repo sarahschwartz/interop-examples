@@ -13,6 +13,7 @@ import {
 import { RESOLVER_URL } from "~/utils/constants";
 import type { DepositEvent, DepositRequestData } from "~/utils/types";
 
+import { CopyIconButton } from "../CopyIconButton";
 import { FlowStepper } from "./FlowStepper";
 
 export function SendToAlias() {
@@ -172,172 +173,120 @@ export function SendToAlias() {
     }
   }
 
-  function CopyIconButton({ onClick, label, copied }: { onClick: () => void; label: string; copied: boolean }) {
-    return (
-      <button
-        className={`copy-icon-btn ${copied ? "copied" : ""}`}
-        type="button"
-        onClick={onClick}
-        aria-label={label}
-        title={label}
-      >
-        {copied ? (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M20 6L9 17L4 12"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ) : (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="9"
-              y="9"
-              width="13"
-              height="13"
-              rx="2"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <path
-              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-          </svg>
-        )}
-      </button>
-    );
-  }
-
   return (
-    <div className="card">
-      <div className="tab-subtitle send-section-title">{t("send.sendToAlias")}</div>
-      <div className="alert alert-info">
-        <strong>{t("send.aliasSendNoticeTitle")}</strong>
-        <div className="alias-step">
-          <span className="step-number">1. </span>
-          {t("send.aliasStep1")}
-        </div>
-        <div className="alias-step">
-          <span className="step-number">2.</span>
-          {t("send.aliasStep2")}
-        </div>
-        <div className="alias-step">
-          <span className="step-number">3. </span>
-          {t("send.aliasStep3")}
-        </div>
-      </div>
-      <div className="send-alias-input-row">
-        <input
-          value={alias}
-          placeholder={t("send.aliasPlaceholder")}
-          onChange={(event) => setAlias(event.target.value)}
-        />
-        <button
-          className="small"
-          type="button"
-          disabled={isAliasLoading}
-          onClick={() => void handleAliasContinue()}
-        >
-          {isAliasLoading ? t("send.loading") : t("send.continue")}
-        </button>
-      </div>
-
-      {aliasSuccess && <div className="alert alert-success">{aliasSuccess}</div>}
-      {aliasError && <div className="alert alert-error">{aliasError}</div>}
-
-      {depositRequest && (
-        <div className="send-alias-details">
-          <div className="aave-info">
-            <div className="aave-info-row">
-              <strong>{t("send.depositAddress")}</strong>
-            </div>
-            <div className="aave-info-row">
-              <div className="inline-copy-row">
-                <code className="send-alias-mono">{depositRequest.l1DepositAddress}</code>
-                <CopyIconButton
-                  label={t("send.copyAddress")}
-                  copied={copiedKey === "send-deposit-address"}
-                  onClick={() => void copyText(depositRequest.l1DepositAddress, "send-deposit-address")}
-                />
-              </div>
-            </div>
-            <div className="aave-info-row">
-              <strong>{t("send.trackingLink")}</strong>
-            </div>
-            <div className="aave-info-row">
-              <div className="inline-copy-row">
-                <code className="send-alias-mono send-alias-link">{trackingLink}</code>
-                <CopyIconButton
-                  label={t("send.copyTrackingLink")}
-                  copied={copiedKey === "send-tracking-link"}
-                  onClick={() => void copyText(trackingLink, "send-tracking-link")}
-                />
-              </div>
-            </div>
+    <>
+      <div className="card">
+        <div className="alert alert-info">
+          <strong>{t("send.aliasSendNoticeTitle")}</strong>
+          <div className="alias-step">
+            <span className="step-number">1. </span>
+            {t("send.aliasStep1")}
           </div>
+          <div className="alias-step">
+            <span className="step-number">2.</span>
+            {t("send.aliasStep2")}
+          </div>
+          <div className="alias-step">
+            <span className="step-number">3. </span>
+            {t("send.aliasStep3")}
+          </div>
+        </div>
+        <div className="send-alias-input-row">
+          <input
+            value={alias}
+            placeholder={t("send.aliasPlaceholder")}
+            onChange={(event) => setAlias(event.target.value)}
+          />
+          <button
+            className="small"
+            type="button"
+            disabled={isAliasLoading}
+            onClick={() => void handleAliasContinue()}
+          >
+            {isAliasLoading ? t("send.loading") : t("send.continue")}
+          </button>
+        </div>
 
-          {transferEvents.length > 0 && (
-            <FlowStepper
-              events={transferEvents}
-              t={t}
-            />
-          )}
+        {aliasSuccess && <div className="alert alert-success">{aliasSuccess}</div>}
+        {aliasError && <div className="alert alert-error">{aliasError}</div>}
 
-          <div>
-            <h3 className="tab-subtitle">{t("send.depositHistory")}</h3>
-            <table className="tx-table">
-              <thead>
-                <tr>
-                  <th>{t("send.asset")}</th>
-                  <th>{t("send.amountShort")}</th>
-                  <th>{t("send.statusShort")}</th>
+        {depositRequest && (
+          <div className="send-alias-details">
+            <div className="aave-info">
+              <div className="aave-info-row">
+                <strong>{t("send.depositAddress")}</strong>
+              </div>
+              <div className="aave-info-row">
+                <div className="inline-copy-row">
+                  <code className="send-alias-mono">{depositRequest.l1DepositAddress}</code>
+                  <CopyIconButton
+                    label={t("send.copyAddress")}
+                    copied={copiedKey === "send-deposit-address"}
+                    onClick={() => void copyText(depositRequest.l1DepositAddress, "send-deposit-address")}
+                  />
+                </div>
+              </div>
+              <div className="aave-info-row">
+                <strong>{t("send.trackingLink")}</strong>
+              </div>
+              <div className="aave-info-row">
+                <div className="inline-copy-row">
+                  <code className="send-alias-mono send-alias-link">{trackingLink}</code>
+                  <CopyIconButton
+                    label={t("send.copyTrackingLink")}
+                    copied={copiedKey === "send-tracking-link"}
+                    onClick={() => void copyText(trackingLink, "send-tracking-link")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {transferEvents.length > 0 && (
+              <FlowStepper
+                events={transferEvents}
+                t={t}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h3 className="tab-subtitle">{t("send.depositHistory")}</h3>
+        <table className="tx-table">
+          <thead>
+            <tr>
+              <th>{t("send.asset")}</th>
+              <th>{t("send.amountShort")}</th>
+              <th>{t("send.statusShort")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {depositEvents.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="tx-empty"
+                >
+                  {t("send.noEvents")}
+                </td>
+              </tr>
+            ) : (
+              depositEvents.map((event) => (
+                <tr key={event.id}>
+                  <td>{event.l1TokenAddress ? shortAddress(event.l1TokenAddress) : "ETH"}</td>
+                  <td>{event.amount ? formatEther(BigInt(event.amount)) : "0"}</td>
+                  <td>
+                    <span className={statusBadgeClass(event.status, event.stuck > 0)}>
+                      {STATUS_LABELS[(event.status ?? "").toLowerCase()] ?? t("send.inProgress")}
+                    </span>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {depositEvents.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={3}
-                      className="tx-empty"
-                    >
-                      {t("send.noEvents")}
-                    </td>
-                  </tr>
-                ) : (
-                  depositEvents.map((event) => (
-                    <tr key={event.id}>
-                      <td>{event.l1TokenAddress ? shortAddress(event.l1TokenAddress) : "ETH"}</td>
-                      <td>{event.amount ? formatEther(BigInt(event.amount)) : "0"}</td>
-                      <td>
-                        <span className={statusBadgeClass(event.status, event.stuck)}>
-                          {STATUS_LABELS[(event.status ?? "").toLowerCase()] ?? t("send.inProgress")}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

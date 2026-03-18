@@ -43,9 +43,9 @@ export interface PendingTxnState extends Metadata {
 
 export type DepositEvent = {
   id: number;
+  stuck: number;
   amount?: string | number | bigint;
   attempts?: number;
-  stuck?: boolean;
   status?: string;
   l1TokenAddress?: string;
   kind?: string;

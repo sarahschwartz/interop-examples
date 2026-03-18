@@ -9,13 +9,15 @@ import {
   shortAddress,
   STATUS_LABELS,
   statusBadgeClass,
+  statusToStep,
   STORAGE_KEY_ALIAS_BY_ACCOUNT,
 } from "~/utils/aliases/utils";
 import { RESOLVER_URL } from "~/utils/constants";
 import type { Tab } from "~/utils/tabs";
-import type { DepositRow, GroupedDeposit } from "~/utils/types";
+import type { DepositRow, GroupedDeposit, StepperStep } from "~/utils/types";
 
 import { BackButton } from "./BackButton";
+import { CopyIconButton } from "./CopyIconButton";
 
 interface Props {
   accountAddress?: Address;
@@ -34,6 +36,9 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
   const [ownedAliases, setOwnedAliases] = useState<Record<string, true>>({});
   const [associatedAlias, setAssociatedAlias] = useState<string>();
   const [copiedAddress, setCopiedAddress] = useState<string>();
+  const [copiedAlias, setCopiedAlias] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [now, setNow] = useState(() => Date.now());
   const { t } = useTranslation();
   const activeAlias = normalizeAlias(associatedAlias || nickname);
   const hasStuckTransactions = rows.some((row) => (row.events ?? []).some((event) => event.stuck));
@@ -88,7 +93,7 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
     return response.json() as Promise<T>;
   }
 
-  async function loadDeposits(showSuccessMessage: boolean, claimOwned = false, preserveRegistrationMessage = false) {
+  async function loadDeposits(claimOwned = false, preserveRegistrationMessage = false) {
     const normalizedNickname = activeAlias;
     if (!normalizedNickname || !accountAddress) {
       setRows([]);
@@ -113,7 +118,7 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
       if (exists.result !== "match") {
         setRows([]);
         setIsAliasOwned(false);
-        if (showSuccessMessage) setSuccessMessage(t("receive.refreshed"));
+        setLastRefreshed(new Date());
         return;
       }
 
@@ -137,8 +142,8 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
 
       setRows(data);
       setIsAliasOwned(true);
+      setLastRefreshed(new Date());
       persistAliasForAccount(accountAddress, normalizedNickname);
-      if (showSuccessMessage) setSuccessMessage(t("receive.refreshed"));
     } catch (error) {
       setIsAliasOwned(false);
       setErrorMessage(error instanceof Error ? error.message : t("receive.requestFailed"));
@@ -148,13 +153,51 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
   }
 
   useEffect(() => {
+    if (registrationMessage && registrationMessageType === "success") {
+      const timer = setTimeout(() => setRegistrationMessage(undefined), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [registrationMessage, registrationMessageType]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(undefined), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 10_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  function getRefreshTimestamp(): string | null {
+    if (!lastRefreshed) return null;
+    const seconds = Math.floor((now - lastRefreshed.getTime()) / 1000);
+    if (seconds < 5) return null;
+    if (seconds < 60) return t("receive.updatedSecondsAgo", { s: seconds });
+    const minutes = Math.floor(seconds / 60);
+    return t("receive.updatedMinutesAgo", { m: minutes });
+  }
+
+  const isRefreshCoolingDown = lastRefreshed !== null && now - lastRefreshed.getTime() < 5000;
+
+  useEffect(() => {
     if (!activeAlias) {
       setRows([]);
       setIsAliasOwned(false);
       setErrorMessage(undefined);
       return;
     }
-    void loadDeposits(false);
+    void loadDeposits();
+  }, [activeAlias, accountAddress]);
+
+  useEffect(() => {
+    if (!activeAlias || !accountAddress) return;
+    const interval = setInterval(() => {
+      void loadDeposits();
+    }, 2500);
+    return () => clearInterval(interval);
   }, [activeAlias, accountAddress]);
 
   async function registerAlias() {
@@ -200,7 +243,7 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
       setRegistrationMessageType("success");
       setRegistrationMessage(t("receive.aliasRegistered"));
       setSuccessMessage(t("receive.aliasRegistered"));
-      await loadDeposits(false, true, true);
+      await loadDeposits(true, true);
     } catch (error) {
       setRegistrationMessageType("error");
       setRegistrationMessage(error instanceof Error ? error.message : t("receive.requestFailed"));
@@ -223,7 +266,7 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
         body: JSON.stringify({ nickname: normalizedNickname, suffix: "" }),
       });
       setSuccessMessage(t("receive.retrySuccess", { id: eventId }));
-      await loadDeposits(false);
+      await loadDeposits();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : t("receive.requestFailed"));
     } finally {
@@ -244,6 +287,17 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
     setSuccessMessage(t("receive.retryAllSuccess", { count: stuckEvents.length }));
   }
 
+  async function copyAlias() {
+    if (!associatedAlias) return;
+    try {
+      await navigator.clipboard.writeText(associatedAlias);
+      setCopiedAlias(true);
+      setTimeout(() => setCopiedAlias(false), 2000);
+    } catch {
+      setErrorMessage(t("receive.requestFailed"));
+    }
+  }
+
   async function copyDepositAddress(address: string) {
     try {
       await navigator.clipboard.writeText(address);
@@ -252,59 +306,6 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
     } catch {
       setErrorMessage(t("receive.requestFailed"));
     }
-  }
-
-  function CopyIconButton({ onClick, label, copied }: { onClick: () => void; label: string; copied: boolean }) {
-    return (
-      <button
-        className={`copy-icon-btn ${copied ? "copied" : ""}`}
-        type="button"
-        onClick={onClick}
-        aria-label={label}
-        title={label}
-      >
-        {copied ? (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M20 6L9 17L4 12"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ) : (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="9"
-              y="9"
-              width="13"
-              height="13"
-              rx="2"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <path
-              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-          </svg>
-        )}
-      </button>
-    );
   }
 
   return (
@@ -320,15 +321,34 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
         </div>
       </div>
 
-      <div className="card">
+      <div className={associatedAlias ? "" : "card"}>
         {associatedAlias && (
-          <div className="">
-            {t("receive.associatedAlias")}: <strong>{associatedAlias}</strong>
+          <div className="aave-info">
+            <div className="aave-info-row receive-alias-row">
+              <span>{t("receive.associatedAlias")}:</span>
+              <strong>{associatedAlias}</strong>
+              <button
+                className="refresh-btn-inline"
+                type="button"
+                onClick={() => void copyAlias()}
+              >
+                {copiedAlias ? t("receive.aliasCopied") : t("receive.copyAlias")}
+              </button>
+            </div>
+            <div className="aave-info-row">
+              <span className="receive-alias-hint">{t("receive.associatedAliasHelp")}</span>
+            </div>
           </div>
         )}
-        {associatedAlias && <div className="alert alert-info">{t("receive.associatedAliasHelp")}</div>}
         {!associatedAlias && (
           <div className="receive-grid">
+            <img
+              src="/ic-h-alias.svg"
+              alt=""
+              className="action-card-icon"
+            />
+            <div className="receive-setup-heading">{t("receive.setupHeading")}</div>
+            <p className="receive-setup-explanation">{t("receive.setupExplanation")}</p>
             <div className="form-group">
               <label htmlFor="receiveNickname">{t("receive.nickname")}</label>
               <input
@@ -337,6 +357,12 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
                 value={nickname}
                 onChange={(event) => setNickname(event.target.value)}
               />
+              <div className="receive-input-helper">{t("receive.nicknameHelperText")}</div>
+              {normalizeAlias(nickname) && (
+                <div className="receive-alias-preview">
+                  {t("receive.aliasPreview")} <strong>{normalizeAlias(nickname)}</strong>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -344,36 +370,11 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
         <div className="receive-actions">
           {!associatedAlias && (
             <button
-              className="secondary-brand"
               type="button"
               onClick={() => void registerAlias()}
               disabled={isBusy}
             >
               {t("receive.registerAlias")}
-            </button>
-          )}
-          <button
-            className="secondary-brand"
-            type="button"
-            onClick={() => void loadDeposits(true)}
-            disabled={isBusy}
-          >
-            {t("receive.refresh")}
-          </button>
-          {hasStuckTransactions && (
-            <button
-              type="button"
-              onClick={() => void retryAllStuck()}
-              disabled={isBusy}
-            >
-              {t("receive.retryAll")}
-              <span
-                className="receive-tooltip"
-                title={t("receive.retryAllTooltip")}
-                aria-label={t("receive.retryAllTooltip")}
-              >
-                ?
-              </span>
             </button>
           )}
         </div>
@@ -383,11 +384,155 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
             {registrationMessage}
           </div>
         )}
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
-        {errorMessage && errorMessage !== t("receive.aliasTaken") && (
-          <div className="alert alert-error">{errorMessage}</div>
-        )}
       </div>
+
+      {associatedAlias && (
+        <div className="card receive-deposits-header-card">
+          <div className="receive-deposits-header">
+            <strong>{t("receive.depositsHeading")}</strong>
+            <div className="receive-refresh-controls">
+              {hasStuckTransactions && (
+                <button
+                  className="refresh-btn-inline receive-retry-all-btn"
+                  type="button"
+                  onClick={() => void retryAllStuck()}
+                  disabled={isBusy}
+                >
+                  {t("receive.retryAll")}
+                </button>
+              )}
+              {isRefreshCoolingDown ? (
+                <span className="refresh-updated-badge">✓ {t("receive.justUpdated")}</span>
+              ) : (
+                <>
+                  {getRefreshTimestamp() && <span className="refresh-timestamp">{getRefreshTimestamp()}</span>}
+                  <button
+                    className="refresh-btn-inline"
+                    type="button"
+                    onClick={() => void loadDeposits()}
+                    disabled={isBusy}
+                  >
+                    {t("receive.refresh")}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {(() => {
+            const STEPS: StepperStep[] = ["deposit", "bridge", "finalize", "complete"];
+            const allGroups = Object.values(groupedDeposits);
+            const allEvents = allGroups.flatMap((group) =>
+              group.rows.flatMap((row) => (row.events ?? []).map((e) => ({ event: e, address: group.address }))),
+            );
+
+            if (allEvents.length === 0 && isAliasOwned) {
+              return <p className="receive-no-deposits">{t("receive.noDepositsYet")}</p>;
+            }
+
+            return (
+              <>
+                <div className="receive-event-list">
+                  {allEvents.map(({ event, address }) => {
+                    const currentStep = statusToStep(event.status, event.stuck > 0);
+                    const currentStepIndex = STEPS.indexOf(currentStep);
+                    const isComplete = (event.status ?? "").toLowerCase() === "credited";
+                    const statusLabel = STATUS_LABELS[(event.status ?? "").toLowerCase()] ?? t("receive.inProgress");
+                    const amount = event.amount ? formatEther(BigInt(event.amount)) : "0";
+                    const asset = event.l1TokenAddress ? shortAddress(event.l1TokenAddress) : "ETH";
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={`receive-event-row${event.stuck ? " receive-event-row--stuck" : ""}`}
+                      >
+                        <div className="receive-event-main">
+                          <div className="receive-event-amount">
+                            <strong>{amount}</strong>
+                            <span className="receive-event-asset">{asset}</span>
+                          </div>
+                          <div className="receive-event-pipeline">
+                            {STEPS.map((step, i) => {
+                              const isFilled = i < currentStepIndex;
+                              const isCurrent = i === currentStepIndex && !isComplete;
+                              const isStuckStep = event.stuck && isCurrent;
+                              const dotClass = [
+                                "receive-step-dot",
+                                (isFilled || isCurrent) && !isStuckStep ? "receive-step-dot--active" : "",
+                                isStuckStep ? "receive-step-dot--stuck" : "",
+                                isComplete ? "receive-step-dot--complete" : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" ");
+                              const lineClass = `receive-step-line${isFilled ? " receive-step-line--active" : ""}`;
+                              return (
+                                <div
+                                  key={step}
+                                  className="receive-step-segment"
+                                >
+                                  <div className={dotClass} />
+                                  {i < STEPS.length - 1 && <div className={lineClass} />}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <span className={statusBadgeClass(event.status, event.stuck > 0)}>{statusLabel}</span>
+                        </div>
+                        {event.stuck > 0 && (
+                          <div className="receive-event-stuck-row">
+                            <span className="receive-event-stuck-detail">
+                              {t("receive.failedAfterAttempts", { n: event.attempts ?? 0 })}
+                            </span>
+                            <button
+                              className="refresh-btn-inline"
+                              type="button"
+                              onClick={() => void retryEvent(event.id)}
+                              disabled={isBusy}
+                            >
+                              {t("receive.retryTransfer")}
+                            </button>
+                          </div>
+                        )}
+                        <details className="receive-tech-details">
+                          <summary>{t("receive.technicalDetails")}</summary>
+                          <div className="receive-tech-address">
+                            <span className="receive-tech-label">{t("receive.depositAddress")}:</span>
+                            <span className="inline-copy-row">
+                              <code>{address}</code>
+                              <CopyIconButton
+                                label={t("send.copyAddress")}
+                                copied={copiedAddress === address}
+                                onClick={() => void copyDepositAddress(address)}
+                              />
+                            </span>
+                          </div>
+                          <p className="receive-tech-hint">{t("receive.depositAddressHint")}</p>
+                        </details>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
+          {successMessage && (
+            <div
+              className="alert alert-success"
+              style={{ marginTop: 12 }}
+            >
+              {successMessage}
+            </div>
+          )}
+          {errorMessage && errorMessage !== t("receive.aliasTaken") && (
+            <div
+              className="alert alert-error"
+              style={{ marginTop: 12 }}
+            >
+              {errorMessage}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="receive-groups">
         {!isAliasOwned && errorMessage === t("receive.aliasTaken") && (
@@ -395,94 +540,6 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
             <div className="alert alert-error">{t("receive.aliasTaken")}</div>
           </div>
         )}
-        {Object.values(groupedDeposits).map((group) => {
-          const events = group.rows.flatMap((row) => row.events ?? []);
-
-          return (
-            <div
-              key={group.address}
-              className="card receive-group-card"
-            >
-              <div className="receive-group-header">
-                <div className="receive-group-address">
-                  {t("receive.depositAddress")}:
-                  <span className="inline-copy-row">
-                    <code>{group.address}</code>
-                    <CopyIconButton
-                      label={t("send.copyAddress")}
-                      copied={copiedAddress === group.address}
-                      onClick={() => void copyDepositAddress(group.address)}
-                    />
-                  </span>
-                </div>
-              </div>
-
-              <div className="receive-group-table-wrapper">
-                <table className="tx-table">
-                  <thead>
-                    <tr>
-                      <th>{t("receive.asset")}</th>
-                      <th>{t("receive.amount")}</th>
-                      <th>{t("receive.status")}</th>
-                      <th>
-                        {t("receive.attempts")}
-                        <span
-                          className="receive-tooltip"
-                          title={t("receive.attemptsTooltip")}
-                          aria-label={t("receive.attemptsTooltip")}
-                        >
-                          ?
-                        </span>
-                      </th>
-                      <th>{t("receive.action")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {events.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="tx-empty"
-                        >
-                          {t("receive.noDeposits")}
-                        </td>
-                      </tr>
-                    )}
-                    {events.map((event) => (
-                      <tr
-                        key={event.id}
-                        className={event.stuck ? "receive-stuck-row" : undefined}
-                      >
-                        <td>{event.l1TokenAddress ? shortAddress(event.l1TokenAddress) : "ETH"}</td>
-                        <td>{event.amount ? formatEther(BigInt(event.amount)) : "0"}</td>
-                        <td>
-                          <span className={statusBadgeClass(event.status, event.stuck)}>
-                            {STATUS_LABELS[(event.status ?? "").toLowerCase()] ?? t("receive.inProgress")}
-                          </span>
-                        </td>
-                        <td>{event.attempts ?? 0}</td>
-                        <td>
-                          {event.stuck ? (
-                            <button
-                              className="small"
-                              type="button"
-                              onClick={() => void retryEvent(event.id)}
-                              disabled={isBusy}
-                            >
-                              {t("receive.retry")}
-                            </button>
-                          ) : (
-                            <span className="tx-empty">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

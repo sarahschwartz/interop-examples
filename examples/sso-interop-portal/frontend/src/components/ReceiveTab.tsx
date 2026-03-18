@@ -192,6 +192,14 @@ export function ReceiveTab({ accountAddress, setActiveTab }: Props) {
     void loadDeposits();
   }, [activeAlias, accountAddress]);
 
+  useEffect(() => {
+    if (!activeAlias || !accountAddress) return;
+    const interval = setInterval(() => {
+      void loadDeposits();
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [activeAlias, accountAddress]);
+
   async function registerAlias() {
     const normalizedNickname = normalizeAlias(nickname);
     setRegistrationMessage(undefined);

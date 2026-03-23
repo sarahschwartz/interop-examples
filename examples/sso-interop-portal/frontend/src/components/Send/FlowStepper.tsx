@@ -11,7 +11,7 @@ export function FlowStepper({ events, t }: { events: DepositEvent[]; t: (key: st
 
   const activeIndex = Math.max(
     0,
-    ...events.map((event) => steps.findIndex((step) => step.key === statusToStep(event.status, event.stuck))),
+    ...events.map((event) => steps.findIndex((step) => step.key === statusToStep(event.status, event.stuck > 0))),
   );
 
   return (
